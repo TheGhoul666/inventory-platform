@@ -1,0 +1,85 @@
+# ============================================================
+# Enterprise Bus Maintenance Inventory Platform
+# Backend Dependencies
+# ============================================================
+
+# Supabase
+supabase==2.4.6
+gotrue==2.4.3
+
+# Core Framework
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+gunicorn==22.0.0
+
+# Database
+sqlalchemy==2.0.30
+asyncpg==0.29.0
+psycopg2-binary
+alembic==1.13.1
+
+# Data Validation
+pydantic==2.7.1
+pydantic-settings==2.2.1
+email-validator==2.1.1
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+
+# Cache
+redis[hiredis]==5.0.4
+aiocache==0.12.2
+
+# Message Queue
+aio-pika==9.4.1
+aiormq==6.7.7
+
+# HTTP Client (webhooks)
+httpx==0.27.0
+aiohttp==3.9.5
+
+# Monitoring & Observability
+prometheus-client==0.20.0
+prometheus-fastapi-instrumentator==7.0.0
+opentelemetry-api==1.24.0
+opentelemetry-sdk==1.24.0
+opentelemetry-instrumentation-fastapi==0.45b0
+opentelemetry-instrumentation-sqlalchemy==0.45b0
+opentelemetry-exporter-otlp==1.24.0
+
+# Logging
+structlog==24.1.0
+python-json-logger==2.0.7
+
+# Utilities
+python-dotenv==1.0.1
+pytz==2024.1
+python-dateutil==2.9.0
+orjson==3.10.3
+cryptography==42.0.7
+itsdangerous==2.2.0
+
+# Testing
+pytest==8.2.0
+pytest-asyncio==0.23.6
+pytest-cov==5.0.0
+httpx==0.27.0
+factory-boy==3.3.0
+faker==25.0.0
+locust==2.28.0
+pytest-xdist==3.5.0
+
+# Development
+black==24.4.2
+ruff==0.4.4
+mypy==1.10.0
+pre-commit==3.7.0
+
+# Security scanning
+bandit==1.7.8
+safety==3.2.0
+
+# Task scheduling
+apscheduler==3.10.4

@@ -1,0 +1,205 @@
+version: "3.9"
+
+# ============================================================
+# Bus Maintenance Inventory Platform — Supabase Edition
+#
+# Database & Auth are managed by Supabase (no local postgres).
+# This compose file runs:
+#   - FastAPI backend
+#   - React frontend (dev)
+#   - Redis (caching + rate limiting)
+#   - RabbitMQ (background workers)
+#   - Nginx (prod reverse proxy)
+#   - Prometheus + Grafana (observability)
+# ============================================================
+
+x-common-env: &common-env
+  APP_ENV: ${APP_ENV:-development}
+  SUPABASE_URL: ${SUPABASE_URL}
+  SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+  SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+  SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+  DATABASE_URL: ${DATABASE_URL}
+  REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379/0
+  RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/
+  APP_SECRET_KEY: ${APP_SECRET_KEY}
+  WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET}
+
+x-backend-base: &backend-base
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  environment:
+    <<: *common-env
+  depends_on:
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+  networks:
+    - internal
+  restart: unless-stopped
+
+services:
+
+  # ---- Redis ----
+  redis:
+    image: redis:7-alpine
+    command: >
+      redis-server
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+        --save ""
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---- RabbitMQ ----
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ---- Backend (dev — hot reload) ----
+  backend:
+    <<: *backend-base
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: >
+      uvicorn app.main:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --log-level info
+    profiles:
+      - dev
+
+  # ---- Backend (production — gunicorn) ----
+  backend-prod:
+    <<: *backend-base
+    ports:
+      - "8000:8000"
+    profiles:
+      - prod
+
+  # ---- Alembic migration job ----
+  migrate:
+    <<: *backend-base
+    command: alembic upgrade head
+    restart: "no"
+    profiles:
+      - migrate
+
+  # ---- Alert Worker ----
+  alert-worker:
+    <<: *backend-base
+    command: python -m app.workers.alert_worker
+    profiles:
+      - dev
+      - prod
+
+  # ---- Frontend (dev) ----
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_SUPABASE_URL: ${SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    restart: unless-stopped
+    profiles:
+      - dev
+
+  # ---- Nginx (production) ----
+  nginx:
+    image: nginx:1.25-alpine
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend-prod
+    networks:
+      - internal
+      - external
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  # ---- Prometheus ----
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    volumes:
+      - ./infrastructure/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - internal
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+    restart: unless-stopped
+
+  # ---- Grafana ----
+  grafana:
+    image: grafana/grafana:10.4.0
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - internal
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  rabbitmq_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge

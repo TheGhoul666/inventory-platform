@@ -1,0 +1,56 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Vite
+*.local
+
+# IDEs
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# Database
+*.sqlite
+*.db
+
+# Secrets
+*.pem
+*.key
+*.cert
