@@ -1,9 +1,9 @@
-/**
- * All READ operations go directly to Supabase (bypasses FastAPI — no IPv6 on this host).
+﻿/**
+ * All READ operations go directly to Supabase (bypasses FastAPI ג€” no IPv6 on this host).
  * WRITE operations (issue/restock/transfer) still route through FastAPI for business-rule enforcement.
  */
 import api from "./api";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabase } from "@/lib/supabase";
 import type {
   InventoryItem,
   PaginatedResponse,
@@ -46,8 +46,7 @@ export const inventoryService = {
   },
 
   getItem: async (id: string): Promise<InventoryItem> => {
-    const { data, error } = await supabase
-      .from("inventory_items")
+    const { data, error } = await supabase.from("inventory_items")
       .select("*, category:inventory_categories(*), warehouse:warehouses(*)")
       .eq("id", id)
       .eq("is_deleted", false)
@@ -86,8 +85,7 @@ export const inventoryService = {
   },
 
   listTransactions: async (params?: { item_id?: string; offset?: number; limit?: number; }): Promise<{ transactions: Transaction[] }> => {
-    let query = supabase
-      .from("inventory_transactions")
+    let query = supabase.from("inventory_transactions")
       .select("*, item:inventory_items(sku, name), warehouse:warehouses!inventory_transactions_warehouse_id_fkey(name, code)")
       .eq("is_deleted", false);
     if (params?.item_id) query = query.eq("item_id", params.item_id) as typeof query;
@@ -119,8 +117,7 @@ export const inventoryService = {
 
 export const analyticsService = {
   getDashboardSummary: async () => {
-    const { data: items, error } = await supabase
-      .from("inventory_items")
+    const { data: items, error } = await supabase.from("inventory_items")
       .select("id, name, sku, quantity, low_stock_threshold, critical_stock_threshold, unit_cost, unit")
       .eq("is_deleted", false);
     if (error) throw error;
@@ -139,8 +136,7 @@ export const analyticsService = {
   },
 
   getItemUsage: async (item_id: string, _days = 30) => {
-    const { data } = await supabase
-      .from("inventory_transactions")
+    const { data } = await supabase.from("inventory_transactions")
       .select("*")
       .eq("item_id", item_id)
       .eq("is_deleted", false)
@@ -155,8 +151,7 @@ export const analyticsService = {
 
 export const alertService = {
   listAlerts: async (params?: { status?: string; severity?: string; offset?: number; limit?: number }) => {
-    let query = supabase
-      .from("alerts")
+    let query = supabase.from("alerts")
       .select("*, item:inventory_items(sku, name), warehouse:warehouses(name, code)")
       .eq("is_deleted", false);
     if (params?.status) query = query.eq("status", params.status) as typeof query;
@@ -177,8 +172,7 @@ export const authService = {
 
 export const warehouseService = {
   listWarehouses: async (_activeOnly = false) => {
-    const { data, error } = await supabase
-      .from("warehouses")
+    const { data, error } = await supabase.from("warehouses")
       .select("*")
       .eq("is_deleted", false)
       .order("name");
@@ -203,7 +197,7 @@ export const warehouseService = {
 
 export const busService = {
   listBuses: async (statusFilter?: string) => {
-    let query = supabase.from("buses").select("*, depot:warehouses(name, code)").eq("is_deleted", false);
+    let query = supabase.from("buses").select("*, depot:warehouses(name, code)").or("is_deleted.eq.false,is_deleted.is.null");
     if (statusFilter) query = query.eq("status", statusFilter) as typeof query;
     const { data, error } = await query.order("fleet_number");
     if (error) throw error;
@@ -248,3 +242,6 @@ export const rolesService = {
   createRole: async (payload: { name: string; description?: string; permissions: string[]; }) => { const { data } = await api.post("/auth/roles", payload); return data; },
   deleteRole: async (name: string) => { await api.delete(`/auth/roles/${name}`); },
 };
+
+
+
