@@ -7,5 +7,5 @@ sdk.dir=/Users/yourname/Library/Android/sdk
 API_BASE_URL=http://10.0.2.2:8000/api/v1
 
 # Supabase (same project as web + backend)
-SUPABASE_URL=https://biqtblvpzquvbfbaneyi.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcXRibHZwenF1dmJmYmFuZXlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTUxNjksImV4cCI6MjA5NzE5MTE2OX0.K9cgxPtvC_8Hi-kpXouigZ7HiwoxqQHSbCLe3QywB_8
+SUPABASE_URL=https://wrspszdkmjdrhupvjblu.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_DkyFTfTG2822idOTTT_3og_K_J1C8Lo

@@ -5,14 +5,10 @@ import Supabase
 final class AppContainer: ObservableObject {
 
     // ── Supabase ──────────────────────────────────────────────────────────────
-    let supabase: SupabaseClient = {
-        guard
-            let urlString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String,
-            let url = URL(string: urlString),
-            let key = Bundle.main.infoDictionary?["SUPABASE_ANON_KEY"] as? String
-        else { fatalError("Missing Supabase config in Info.plist") }
-        return SupabaseClient(supabaseURL: url, supabaseKey: key)
-    }()
+    let supabase: SupabaseClient = SupabaseClient(
+        supabaseURL: URL(string: SupabaseConfig.url)!,
+        supabaseKey: SupabaseConfig.anonKey
+    )
 
     // ── Networking ────────────────────────────────────────────────────────────
     lazy var apiClient: APIClient = APIClient(supabase: supabase)
