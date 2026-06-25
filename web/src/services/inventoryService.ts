@@ -3,7 +3,7 @@
  * WRITE operations (issue/restock/transfer) still route through FastAPI for business-rule enforcement.
  */
 import api from "./api";
-import { supabase, supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import type {
   InventoryItem,
   PaginatedResponse,
@@ -242,6 +242,3 @@ export const rolesService = {
   createRole: async (payload: { name: string; description?: string; permissions: string[]; }) => { const { data } = await api.post("/auth/roles", payload); return data; },
   deleteRole: async (name: string) => { await api.delete(`/auth/roles/${name}`); },
 };
-
-
-
