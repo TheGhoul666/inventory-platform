@@ -1,0 +1,11 @@
+generatorName: kotlin
+outputDir: ../../generated/android
+inputSpec: ../openapi/openapi.json
+additionalProperties:
+  packageName: com.busops.inventory.generated
+  groupId: com.busops
+  artifactId: inventory-client
+  dateLibrary: java8
+  useCoroutines: true
+  serializationLibrary: kotlinx_serialization
+  enumPropertyNaming: UPPERCASE

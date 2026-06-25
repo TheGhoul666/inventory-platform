@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+.venv/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Web
+node_modules/
+dist/
+.vite/
+*.local
+
+# Android
+mobile-android/.gradle/
+mobile-android/build/
+mobile-android/app/build/
+mobile-android/local.properties
+*.keystore
+!debug.keystore
+
+# iOS
+mobile-ios/DerivedData/
+mobile-ios/build/
+mobile-ios/*.xcworkspace/xcuserdata/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Secrets
+.env
+.env.local
+.env.production
+*.pem
+*.p12
+secrets/
+
+# Generated API clients
+shared/generated/
+
+# OS
+.DS_Store
+Thumbs.db

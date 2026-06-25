@@ -1,0 +1,11 @@
+generatorName: swift5
+outputDir: ../../generated/ios
+inputSpec: ../openapi/openapi.json
+additionalProperties:
+  projectName: BusOpsClient
+  podSummary: BusOps Inventory API Client
+  podVersion: 1.0.0
+  podAuthors: BusOps
+  responseAs: AsyncAwait
+  useClasses: true
+  swiftPackagePath: Sources/BusOpsClient

@@ -1,0 +1,11 @@
+# Copy to local.properties (gitignored) and fill in values
+
+# Android SDK path (set by Android Studio automatically)
+sdk.dir=/Users/yourname/Library/Android/sdk
+
+# BusOps API — use 10.0.2.2 for Android emulator to reach host localhost
+API_BASE_URL=http://10.0.2.2:8000/api/v1
+
+# Supabase (same project as web + backend)
+SUPABASE_URL=https://biqtblvpzquvbfbaneyi.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcXRibHZwenF1dmJmYmFuZXlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTUxNjksImV4cCI6MjA5NzE5MTE2OX0.K9cgxPtvC_8Hi-kpXouigZ7HiwoxqQHSbCLe3QywB_8

@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head><title>BusOps Auto-Login</title></head>
+<body><p>Logging in...</p>
+<script>
+localStorage.setItem('sb-biqtblvpzquvbfbaneyi-auth-token', JSON.stringify({
+  "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjdiNjUzZTk3LTJkMTktNDgxMC05YjAyLWRkYzJlZTYyODdkMSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JpcXRibHZwenF1dmJmYmFuZXlpLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjZTBlYTkyOC0zMjIwLTRkOTctYWYwZi01MDMyNGVhMmQ1ZDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzgxNjI1MDk0LCJpYXQiOjE3ODE2MjE0OTQsImVtYWlsIjoiYWRtaW5AYnVzb3BzLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7ImlzX3N1cGVyYWRtaW4iOnRydWUsInByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXSwicm9sZSI6IlN1cGVyQWRtaW4ifSwidXNlcl9tZXRhZGF0YSI6eyJmdWxsX25hbWUiOiJTeXN0ZW0gQWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODE2MjE0OTR9XSwic2Vzc2lvbl9pZCI6IjkxODBjMGJhLTYyNTQtNDA1Mi05MzYyLTRkNGUwZmQ5NjViMCIsImlzX2Fub255bW91cyI6ZmFsc2V9.gHX2mOa2osXDvU-XdMwMnPAYhHrj41_7Y4KP9f37d0YbrumU3uXimlJOSwO3qA3t84FLemS9DRu22jfzXeLZ-w",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "expires_at": 1781625094,
+  "refresh_token": "ofho4br4atxp",
+  "user": {
+    "id": "ce0ea928-3220-4d97-af0f-50324ea2d5d9",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "admin@busops.com",
+    "app_metadata": {"is_superadmin":true,"provider":"email","providers":["email"],"role":"SuperAdmin"},
+    "user_metadata": {"full_name":"System Admin","username":"admin"},
+    "created_at": "2026-06-16T14:09:03.222487Z",
+    "updated_at": "2026-06-16T14:15:56.503218Z"
+  }
+}));
+window.location.replace('/');
+</script>
+</body></html>

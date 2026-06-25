@@ -1,0 +1,83 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths: [mobile-ios/**, shared/**]
+  pull_request:
+    branches: [main]
+    paths: [mobile-ios/**]
+
+jobs:
+  build:
+    runs-on: macos-14       # Apple Silicon runner for fast builds
+    defaults:
+      run:
+        working-directory: mobile-ios
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.0.app
+
+      - name: Resolve SPM dependencies
+        run: xcodebuild -resolvePackageDependencies -scheme BusOpsInventory
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -scheme BusOpsInventory \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,OS=18.0,name=iPhone 16 Pro' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            DEVELOPMENT_TEAM="" \
+          | xcbeautify
+
+      - name: Test
+        run: |
+          xcodebuild test \
+            -scheme BusOpsInventory \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,OS=18.0,name=iPhone 16 Pro' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+          | xcbeautify
+
+  release:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: mobile-ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import certificates
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DIST_CERT_P12 }}
+          p12-password: ${{ secrets.IOS_DIST_CERT_P12_PASSWORD }}
+      - name: Import provisioning profile
+        uses: apple-actions/download-provisioning-profiles@v3
+        with:
+          bundle-id: com.busops.inventory
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -scheme BusOpsInventory \
+            -archivePath build/BusOpsInventory.xcarchive \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }}
+      - name: Export IPA
+        run: xcodebuild -exportArchive -archivePath build/BusOpsInventory.xcarchive -exportPath build/ipa -exportOptionsPlist ExportOptions.plist
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: build/ipa/BusOpsInventory.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
