@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>תחבורה AI — Driver app (simulated)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* Stands in for the spec's native Kotlin/Swift driver app (ב.4) — a mobile-shaped
+     web view, not a real native build. Clearly a simulation, same as GPS/WhatsApp. */
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; max-width: 480px; margin-inline: auto; background: #f8fafc; }
+  h1 { font-size: 18px; }
+  .card { background: #fff; border: 1px solid #e2e2e2; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  button { width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: none; background: #2563eb; color: #fff; margin-top: 6px; }
+  #banner { background: #eef2ff; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 12px; }
+  .msg { font-size: 13px; padding: 4px 0; border-bottom: 1px solid #f1f1f1; }
+  .msg.inbound { color: #2563eb; }
+  select { width: 100%; padding: 8px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div id="banner">אפליקציית נהג מדומה — לא בנייה Native אמיתית ל-Android/iOS.</div>
+<h1>שלום, נהג</h1>
+<select id="driver-select"></select>
+<div class="card">
+  <b>הנסיעות שלי היום</b>
+  <div id="trips"></div>
+</div>
+<div class="card">
+  <button onclick="checkin()">✅ אשר שהרכב במקומו</button>
+</div>
+<div class="card">
+  <b>הודעות (WhatsApp / IVR)</b>
+  <div id="messages"></div>
+</div>
+
+<script>
+const API = window.API_BASE || "http://localhost:8000";
+let driverId = null;
+
+async function loadDrivers() {
+  const drivers = await fetch(`${API}/drivers`).then(r => r.json());
+  const sel = document.getElementById('driver-select');
+  sel.innerHTML = drivers.map(d => `<option value="${d.driver_id}">${d.full_name}</option>`).join('');
+  driverId = new URLSearchParams(location.search).get('driver_id') || drivers[0]?.driver_id;
+  sel.value = driverId;
+  sel.onchange = () => { driverId = sel.value; refresh(); };
+  refresh();
+}
+
+async function refresh() {
+  if (!driverId) return;
+  const trips = await fetch(`${API}/drivers/${driverId}/trips-today`).then(r => r.json());
+  document.getElementById('trips').innerHTML = trips.length
+    ? trips.map(t => `<div>${new Date(t.plan_start_time).toLocaleTimeString('he-IL')} — ${t.status}</div>`).join('')
+    : '<div>אין נסיעות היום</div>';
+
+  const msgs = await fetch(`${API}/drivers/${driverId}/messages`).then(r => r.json());
+  document.getElementById('messages').innerHTML = msgs.length
+    ? msgs.map(m => `<div class="msg ${m.direction}">[${m.channel}] ${m.body}</div>`).join('')
+    : '<div>אין הודעות</div>';
+}
+
+async function checkin() {
+  await fetch(`${API}/drivers/${driverId}/checkin`, { method: 'POST' });
+  await refresh();
+  alert('הרכב אושר במקומו');
+}
+
+loadDrivers();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>תחבורה AI — מוקד תפעול</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* Design tokens — approximating the reference mockup's design system.
+   ponytail: hand-rolled palette, not the mockup's actual _ds bundle (not a portable
+   asset) — close enough for an internal dispatcher tool, not pixel-identical. */
+:root{
+  --color-bg:#f6f7f9; --color-surface:#ffffff; --color-text:#16181d; --color-divider:#e4e6eb;
+  --color-neutral-100:#f1f2f4; --color-neutral-200:#e6e8eb; --color-neutral-400:#b8bcc4;
+  --color-neutral-500:#8b8f99; --color-neutral-600:#6b6f79; --color-neutral-800:#2b2d33;
+  --color-accent:#3452eb; --color-accent-100:#e8ecfe; --color-accent-200:#cfd7fd; --color-accent-300:#aebafb;
+  --color-accent-500:#4a68f0; --color-accent-600:#3452eb; --color-accent-700:#2740c9; --color-accent-800:#1f3199;
+  --color-accent-2-100:#e3f7ec; --color-accent-2-300:#a6e6c4; --color-accent-2-500:#22b56f;
+  --color-accent-2-700:#178a54; --color-accent-2-800:#146e44;
+  --font-heading:"Segoe UI",system-ui,sans-serif; --font-body:"Segoe UI",system-ui,sans-serif;
+  --font-mono:ui-monospace,"Consolas","SF Mono",monospace;
+  --space-3:12px; --space-4:16px; --space-6:24px; --radius-sm:4px; --radius-md:8px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 14px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{direction:rtl;font-family:var(--font-body);background:var(--color-bg);color:var(--color-text)}
+::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-thumb{background:var(--color-neutral-400);border-radius:999px}
+
+.app{display:flex;height:100vh;overflow:hidden}
+aside{width:250px;flex:none;background:var(--color-surface);border-left:1px solid var(--color-divider);display:flex;flex-direction:column;padding:var(--space-4);gap:var(--space-4);overflow-y:auto}
+.brand{font-family:var(--font-heading);font-size:22px;font-weight:700}
+.brand-sub{color:var(--color-neutral-600);font-size:12px;margin-top:2px}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-md);border:none;cursor:pointer;font-family:var(--font-body);font-size:14px;width:100%;text-align:right;background:transparent;color:var(--color-text)}
+nav button:hover{background:var(--color-neutral-200)}
+nav button.active{background:var(--color-accent);color:#fff}
+nav button svg{width:18px;height:18px;flex:none}
+
+main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+header{padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--color-divider);display:flex;align-items:center;justify-content:space-between;flex:none}
+header h2{margin:0;font-family:var(--font-heading);font-size:20px}
+header .sub{color:var(--color-neutral-600);font-size:13px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--color-accent-200);color:var(--color-accent-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading)}
+
+.content{flex:1;overflow-y:auto;padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-6)}
+.screen{display:none;flex-direction:column;gap:var(--space-6)}
+.screen.active{display:flex}
+
+.card{background:var(--color-surface);border-radius:var(--radius-md);border:1px solid var(--color-divider)}
+.card.elev-sm{box-shadow:var(--shadow-sm)} .card.elev-md{box-shadow:var(--shadow-md)}
+.card-pad{padding:var(--space-4)}
+.card-kicker{font-size:12px;color:var(--color-neutral-600)}
+.card-title{font-family:var(--font-heading);font-weight:600}
+.card-body{font-size:14px;color:var(--color-neutral-800);margin:4px 0}
+.hr{height:1px;background:var(--color-divider)}
+
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:var(--color-neutral-200);color:var(--color-neutral-800)}
+.tag-accent{background:var(--color-accent-100);color:var(--color-accent-800)}
+.tag-accent-solid{background:var(--color-accent-700);color:#fff}
+.tag-accent-2{background:var(--color-accent-2-100);color:var(--color-accent-2-800)}
+.tag-neutral{background:var(--color-neutral-200);color:var(--color-neutral-800)}
+
+.btn{padding:8px 16px;border-radius:var(--radius-sm);border:none;font-size:13px;cursor:pointer;font-family:var(--font-body)}
+.btn-primary{background:var(--color-accent);color:#fff}
+.btn-secondary{background:var(--color-neutral-200);color:var(--color-text)}
+.btn-ghost{background:transparent;color:var(--color-accent-700)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:var(--space-4)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+.kpi-num{font-family:var(--font-heading);font-size:34px}
+.kpi-num small{font-size:14px;color:var(--color-neutral-600)}
+
+/* Table density modeled on Y-IT's actual product screens (My Fleet Tablet) — a light,
+   dense audit-log grid, not the dark marketing site. Compact rows, monospace for
+   numeric/time/id columns, colored status dot per row. */
+table.table{width:100%;border-collapse:collapse;font-size:13px}
+table.table th{text-align:right;color:var(--color-neutral-600);font-weight:500;font-size:11px;padding:5px 8px;border-bottom:1px solid var(--color-divider)}
+table.table td{padding:5px 8px;border-bottom:1px solid var(--color-neutral-100);height:30px}
+table.table tr:hover td{background:var(--color-neutral-100)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:6px;flex:none}
+
+.field label{font-size:12px;color:var(--color-neutral-600);display:block;margin-bottom:4px}
+.input,select.input{width:100%;padding:8px 10px;border:1px solid var(--color-divider);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px}
+
+#map{height:300px;border-radius:var(--radius-md);overflow:hidden}
+.vehicle-row{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 6px;border-radius:var(--radius-sm)}
+.vehicle-row:hover{background:var(--color-neutral-100)}
+.vehicle-row .mono-end{margin-inline-start:auto;font-size:11px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+.gantt-wrap{overflow-x:auto}
+.gantt{display:grid;grid-auto-rows:32px;gap:2px;min-width:1600px;font-family:var(--font-mono)}
+.gantt .hourcell{font-size:11px;color:var(--color-neutral-600);text-align:center;align-self:end;grid-column:span 2}
+.gantt .drivername{display:flex;align-items:center;font-size:12px;font-weight:600;font-family:var(--font-body)}
+.gantt .block{border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:11px;padding:0 6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:60px}
+.block.normal{background:var(--color-neutral-200);color:var(--color-neutral-800)}
+.block.pink{background:var(--color-accent-300);color:var(--color-accent-800)}
+.block.red{background:var(--color-accent-700);color:#fff}
+.block.closed{background:var(--color-neutral-100);color:var(--color-neutral-500);text-decoration:line-through}
+
+.msg{border-radius:var(--radius-md);padding:10px;max-width:80%;font-size:13px;margin-bottom:6px}
+.msg.outbound{background:var(--color-neutral-200);align-self:flex-start}
+.msg.inbound{background:var(--color-accent-200);color:var(--color-accent-800);align-self:flex-end}
+
+.banner{background:var(--color-accent-100);color:var(--color-accent-800);padding:8px 12px;border-radius:var(--radius-sm);font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div>
+      <div class="brand">תחבורה AI</div>
+      <div class="brand-sub">מוקד בקרה ותפעול — MVP demo</div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="banner" style="margin-top:auto">GPS + WhatsApp/IVR מדומים. <a href="driver.html" target="_blank" style="color:var(--color-accent-700)">תצוגת אפליקציית נהג ←</a></div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <h2 id="screen-title"></h2>
+        <div class="sub" id="screen-subtitle"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="tag tag-accent-2">מכויל אוטומטית לגודל הצי בפועל</span>
+        <div class="avatar">ס</div>
+      </div>
+    </header>
+    <div class="content">
+
+      <section class="screen" data-screen="overview">
+        <div class="grid-4">
+          <div class="card elev-sm card-pad">
+            <div class="card-kicker">רכבים פעילים (GPS תקין)</div>
+            <div class="kpi-num" id="kpi-vehicles">—</div>
+          </div>
+          <div class="card elev-sm card-pad">
+            <div class="card-kicker">נסיעות היום — עם נהג</div>
+            <div class="kpi-num" id="kpi-trips">—</div>
+          </div>
+          <div class="card elev-sm card-pad">
+            <div class="card-kicker">גלגולים ממתינים</div>
+            <div class="kpi-num" id="kpi-reassign">—</div>
+          </div>
+          <div class="card elev-sm card-pad">
+            <div class="card-kicker">התראות פעילות</div>
+            <div class="kpi-num" id="kpi-alerts" style="color:var(--color-accent-700)">—</div>
+            <div class="card-body" id="kpi-alerts-detail" style="font-size:12px"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="grid-template-columns:2.2fr 1fr">
+          <div class="card elev-md" style="padding:0;overflow:hidden">
+            <div id="map"></div>
+          </div>
+          <div class="card elev-sm card-pad" style="overflow-y:auto;max-height:300px">
+            <div class="card-title" style="font-size:15px">מיקום רכבים — GPS Fusion</div>
+            <div id="vehicle-list" style="margin-top:8px"></div>
+            <div class="hr" style="margin:10px 0"></div>
+            <p class="card-body" style="font-size:11px">מקור ראשי: ISR (מדומה) · גיבוי: איתורן (מדומה) · חירום: GPS טלפון הנהג (מדומה)</p>
+          </div>
+        </div>
+
+        <div class="card elev-sm card-pad">
+          <div class="card-title" style="font-size:17px">לוח סידורי עבודה יומי — כל הנהגים הפעילים</div>
+          <p class="card-body" style="font-size:12px">מסגרת סידור-נהג לכל נהג, 06:00–22:00 — נסיעות רגילות, ורודות, אדומות וסגורות. חלון תצוגה בלבד; נסיעות מחוץ לשעות אלה לא מוצגות.</p>
+          <div class="gantt-wrap"><div id="gantt" class="gantt"></div></div>
+        </div>
+
+        <div class="card elev-sm card-pad">
+          <div class="card-title" style="font-size:16px">נסיעות הדורשות תשומת לב</div>
+          <table class="table"><thead><tr><th>קו</th><th>שעה</th><th>סטטוס</th><th>נהג</th><th></th></tr></thead>
+            <tbody id="trip-watch"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="routes">
+        <div class="card elev-sm card-pad">
+          <div class="card-title" style="font-size:15px">כל הקווים</div>
+          <table class="table"><thead><tr><th>קו</th><th>נסיעות היום</th><th>תחנות</th><th>נגישות</th><th>קו קצר</th><th>תמרון פעיל</th></tr></thead>
+            <tbody id="routes-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="reassignment">
+        <div class="grid-2">
+          <div class="card elev-sm card-pad">
+            <div class="card-title" style="font-size:15px">נסיעות פתוחות לשיבוץ</div>
+            <div id="open-trip-list" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+          <div class="card elev-sm card-pad" id="reassign-detail">
+            <p class="card-body">בחר נסיעה פתוחה כדי לראות הצעת נהג ו-Blast Radius.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="diversion">
+        <div class="grid-2">
+          <div class="card elev-sm card-pad">
+            <div class="card-title" style="font-size:15px">אירועים חוסמי דרך</div>
+            <div id="incident-list" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>
+            <div class="hr" style="margin:10px 0"></div>
+            <div class="field"><label>מקור</label>
+              <select class="input" id="inc-source"><option value="dispatcher_manual">סדרן</option><option value="sos_report">SOS</option><option value="external_traffic_api">Google Maps Traffic</option></select>
+            </div>
+            <div class="field"><label>תיאור</label><input class="input" id="inc-desc" placeholder="חסימה ברחוב ביאליק"></div>
+            <button class="btn btn-primary" style="margin-top:8px" onclick="createIncident()">דווח אירוע חדש</button>
+          </div>
+          <div class="card elev-sm card-pad" id="diversion-detail">
+            <p class="card-body">בחר אירוע כדי להציע ולאשר תמרון מסלול.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="search">
+        <div class="card elev-sm card-pad">
+          <div class="card-title" style="font-size:15px">בחר נסיעה פתוחה</div>
+          <select class="input" id="search-trip-select" onchange="searchDrivers()"></select>
+        </div>
+        <div class="card elev-sm card-pad">
+          <table class="table"><thead><tr><th>נהג</th><th>רישיון</th><th></th></tr></thead>
+            <tbody id="search-results"></tbody>
+          </table>
+        </div>
+        <p class="card-body" style="font-size:12px">שיבוץ ידני יוצר רשומת גלגול זהה במבנה להצעת AI — initiated_by = dispatcher_manual.</p>
+      </section>
+
+      <section class="screen" data-screen="closeTrip">
+        <div class="card elev-sm card-pad">
+          <div class="card-title" style="font-size:15px">בחר נסיעה לסגירה</div>
+          <select class="input" id="close-trip-select" onchange="renderCloseReasons()"></select>
+        </div>
+        <div class="card elev-sm card-pad">
+          <div class="field"><label>תוצאה</label>
+            <select class="input" id="close-outcome" onchange="renderCloseReasons()">
+              <option value="trip_burn">שריפה (trip_burn)</option>
+              <option value="trip_no_show">אי-ביצוע (trip_no_show)</option>
+            </select>
+          </div>
+          <div class="field"><label>סיבה (חובה)</label><select class="input" id="close-reason"></select></div>
+          <button class="btn btn-primary" style="margin-top:8px" onclick="closeSelectedTrip()">אשר סגירת נסיעה</button>
+          <div id="close-result" style="margin-top:8px"></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="comms">
+        <div class="grid-2">
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <div class="card-kicker">Templates מאושרים ל-Meta (הפניה בלבד — לא נשלחים בפועל)</div>
+            <div class="card elev-sm card-pad"><div class="card-title" style="font-size:13px">סידור יומי</div><p class="card-body">"בוקר טוב [שם]. הסידור שלך מוכן. השב 1 לאישור."</p></div>
+            <div class="card elev-sm card-pad"><div class="card-title" style="font-size:13px">גלגול דחוף</div><p class="card-body">"עדכון דחוף: קו [X], נסיעת [שעה]. השב 1 לאישור."</p></div>
+          </div>
+          <div class="card elev-sm card-pad">
+            <div class="card-title" style="font-size:15px">יומן הודעות אמיתי — לפי נהג</div>
+            <select class="input" id="comms-driver-select" onchange="refreshComms()" style="margin:8px 0"></select>
+            <div id="comms-log" style="display:flex;flex-direction:column;gap:4px;max-height:320px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="kpi">
+        <p class="card-body" style="font-size:12px">חלק מהמדדים נמדדים בזמן אמת מהמערכת; חלקם הם יעדי תכנון (Design Targets) מהמסמך, מסומנים בהתאם.</p>
+        <div class="grid-4" id="kpi-grid"></div>
+      </section>
+
+      <section class="screen" data-screen="engine">
+        <div class="card elev-sm card-pad"><p class="card-body">איך מנוע ה-AI מקבל החלטות — הסבר להמחשה, אינו מחובר לנתונים חיים.</p></div>
+        <div class="grid-2">
+          <div class="card elev-sm card-pad"><div class="card-title" style="font-size:15px">Blast Radius — עובדה, לא חיזוי</div><p class="card-body">לפני כל הצעת גלגול, המנוע בודק אילו נסיעות אחרות הנהג המוצע כבר משובץ אליהן היום — ספירה דטרמיניסטית, לא ניחוש. זו הלוגיקה האמיתית שרצה בכל הצעה במסך "החלטת גלגול".</p></div>
+          <div class="card elev-sm card-pad"><div class="card-title" style="font-size:15px">מה עוד לא בנוי</div><p class="card-body">Online Learning, Yesterday-Plus-Delta, ותצורות ILP/RL — לא בנויים ב-MVP הזה. הדירוג הנוכחי הוא כלל פשוט: זמינות + פחות התנגשויות, לא מודל נלמד.</p></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const API = window.API_BASE || "http://localhost:8000";
+
+const NAV = [
+  { key: 'overview', icon: 'map', label: 'סקירה ותפעול' },
+  { key: 'routes', icon: 'route', label: 'קווים' },
+  { key: 'reassignment', icon: 'shuffle', label: 'החלטת גלגול' },
+  { key: 'diversion', icon: 'navigation', label: 'תמרון מסלול' },
+  { key: 'search', icon: 'user-search', label: 'חיפוש ושיבוץ נהג' },
+  { key: 'closeTrip', icon: 'square-check', label: 'סגירת נסיעה' },
+  { key: 'comms', icon: 'message-circle', label: 'תקשורת נהגים' },
+  { key: 'kpi', icon: 'bar-chart-3', label: 'בקרה ובריאות מערכת' },
+  { key: 'engine', icon: 'cpu', label: 'מנוע האופטימיזציה' },
+];
+const TITLES = {
+  overview: ['סקירה ותפעול', 'מפה חיה, KPIs ונסיעות הדורשות תשומת לב'],
+  routes: ['קווים', 'כל קווי השירות — נסיעות, תחנות ותמרונים'],
+  reassignment: ['החלטת גלגול', 'Blast Radius אמיתי מהמנוע'],
+  diversion: ['תמרון מסלול', 'אירוע חוסם דרך — דיווח וטיפול'],
+  search: ['חיפוש ושיבוץ נהג', 'שיבוץ ידני = גלגול, initiated_by=dispatcher_manual'],
+  closeTrip: ['סגירת נסיעה', 'תוצאה + סיבה חובה'],
+  comms: ['תקשורת נהגים', 'WhatsApp ראשי, IVR גיבוי — יומן אמיתי'],
+  kpi: ['בקרה ובריאות מערכת', 'נתונים חיים + יעדי תכנון מהמסמך'],
+  engine: ['מנוע האופטימיזציה', 'הסבר להמחשה בלבד'],
+};
+
+let currentScreen = 'overview';
+const navEl = document.getElementById('nav');
+NAV.forEach(n => {
+  const btn = document.createElement('button');
+  btn.innerHTML = `<i data-lucide="${n.icon}"></i><span>${n.label}</span>`;
+  btn.onclick = () => showScreen(n.key);
+  btn.dataset.key = n.key;
+  navEl.appendChild(btn);
+});
+
+let map, markers = {};
+function initMap() {
+  map = L.map('map').setView([32.08, 34.78], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+}
+
+function showScreen(key) {
+  currentScreen = key;
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === key));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  document.getElementById('screen-title').textContent = TITLES[key][0];
+  document.getElementById('screen-subtitle').textContent = TITLES[key][1];
+  if (window.lucide) lucide.createIcons();
+  if (key === 'overview' && map) setTimeout(() => map.invalidateSize(), 50);
+  refreshScreen(key);
+}
+
+async function getJSON(path, opts) {
+  const res = await fetch(`${API}${path}`, opts);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function timeOf(iso) { return new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }); }
+
+async function refreshScreen(key) {
+  try {
+    if (key === 'overview') await refreshOverview();
+    else if (key === 'routes') await refreshRoutes();
+    else if (key === 'reassignment') await refreshReassignment();
+    else if (key === 'diversion') await refreshDiversion();
+    else if (key === 'search') await refreshSearch();
+    else if (key === 'closeTrip') await refreshCloseTrip();
+    else if (key === 'comms') await refreshComms();
+    else if (key === 'kpi') await refreshKpi();
+  } catch (e) { console.error(e); }
+}
+
+/* ---------- Overview ---------- */
+async function refreshOverview() {
+  const [vehicles, trips, lines, reassignments, drivers, incidents] = await Promise.all([
+    getJSON('/vehicles'), getJSON('/trips'), getJSON('/lines'),
+    getJSON('/reassignments?status=proposed'), getJSON('/drivers'), getJSON('/incidents?status=active'),
+  ]);
+  const lineNum = id => lines.find(l => l.line_id === id)?.line_number ?? id;
+
+  const activeVehicles = vehicles.filter(v => v.gps_confidence_score >= 60).length;
+  document.getElementById('kpi-vehicles').innerHTML = `${activeVehicles}<small> / ${vehicles.length}</small>`;
+  const withDriver = trips.filter(t => t.driver_id).length;
+  document.getElementById('kpi-trips').innerHTML = `${withDriver}<small> / ${trips.length}</small>`;
+  document.getElementById('kpi-reassign').textContent = reassignments.length;
+
+  const deadSensors = vehicles.filter(v => v.sensor_health_status === 'dead').length;
+  const alerts = deadSensors + incidents.length;
+  document.getElementById('kpi-alerts').textContent = alerts;
+  document.getElementById('kpi-alerts-detail').textContent = `${incidents.length} חוסם דרך · ${deadSensors} חיישן מת`;
+
+  for (const v of vehicles) {
+    if (v.last_known_lat == null) continue;
+    const pos = [v.last_known_lat, v.last_known_lon];
+    if (!markers[v.vehicle_id]) markers[v.vehicle_id] = L.circleMarker(pos, { radius: 8 }).addTo(map);
+    const c = v.gps_confidence_score ?? 0;
+    markers[v.vehicle_id].setLatLng(pos)
+      .setStyle({ color: c >= 85 ? '#22b56f' : c >= 60 ? '#d97706' : '#8b8f99' })
+      .bindTooltip(`${v.license_plate} — ${c}%`);
+  }
+  document.getElementById('vehicle-list').innerHTML = vehicles.map(v => {
+    const c = v.gps_confidence_score ?? 0;
+    const color = c >= 85 ? '#22b56f' : c >= 60 ? '#d97706' : '#8b8f99';
+    const src = c >= 99 ? '3 מקורות' : c >= 85 ? '2 מקורות' : c >= 60 ? 'מקור יחיד' : 'מיקום לא ידוע';
+    return `<div class="vehicle-row"><span class="dot" style="background:${color}"></span><span class="mono">${v.license_plate}</span><span style="color:var(--color-neutral-600);font-size:11px">${src}</span><span class="mono mono-end" style="color:${color}">${c}%</span></div>`;
+  }).join('');
+
+  renderGantt(trips, drivers, lineNum);
+
+  const watch = trips.filter(t => !t.driver_id || t.late_departure_severity || t.status === 'trip_burn' || t.status === 'trip_no_show').slice(0, 8);
+  document.getElementById('trip-watch').innerHTML = watch.length ? watch.map(t => {
+    const dotColor = !t.driver_id ? '#d97706' : (t.status === 'trip_burn' || t.status === 'trip_no_show') ? '#dc2626' : '#8b8f99';
+    return `
+    <tr><td class="mono">${lineNum(t.line_id)}</td><td class="mono">${timeOf(t.plan_start_time)}</td>
+    <td><span class="status-dot" style="background:${dotColor}"></span><span class="tag ${t.driver_id ? 'tag-neutral' : 'tag-accent'}">${t.driver_id ? t.status : 'ללא נהג'}</span></td>
+    <td>—</td>
+    <td>${!t.driver_id ? `<button class="btn btn-ghost" onclick="showScreen('reassignment')">לטיפול</button>` : ''}</td></tr>`;
+  }).join('') : '<tr><td colspan="5">אין נסיעות הדורשות תשומת לב</td></tr>';
+}
+
+function renderGantt(trips, drivers, lineNum) {
+  const startHour = 6, hours = 16; // 06:00–22:00, matching the reference mockup's window
+  const cols = hours * 2;
+  const el = document.getElementById('gantt');
+  el.style.gridTemplateColumns = `170px repeat(${cols}, 44px)`;
+  let html = '<div></div>';
+  for (let i = 0; i < hours; i++) html += `<div class="hourcell">${String(startHour + i).padStart(2, '0')}:00</div>`;
+
+  for (const d of drivers) {
+    html += `<div class="drivername">${d.full_name}</div>`;
+    const dayTrips = trips.filter(t => t.driver_id === d.driver_id);
+    for (const t of dayTrips) {
+      const start = new Date(t.plan_start_time);
+      const hourFrac = start.getHours() + start.getMinutes() / 60;
+      if (hourFrac < startHour || hourFrac >= startHour + hours) continue;
+      const durHours = (new Date(t.plan_end_time) - start) / 3600000;
+      const col = 2 + Math.round((hourFrac - startHour) * 2);
+      const span = Math.max(1, Math.round(durHours * 2));
+      let kind = 'normal';
+      if (t.status === 'trip_burn' || t.status === 'trip_no_show') kind = 'closed';
+      else if (t.trip_tag === 'critical_flag') kind = 'red';
+      else if (t.trip_tag === 'new_start_flag') kind = 'pink';
+      html += `<div class="block ${kind}" style="grid-column:${col} / span ${span}">קו ${lineNum(t.line_id)}</div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+/* ---------- Routes ---------- */
+async function refreshRoutes() {
+  const [lines, trips, stops] = await Promise.all([getJSON('/lines'), getJSON('/trips'), getJSON('/stops')]);
+  document.getElementById('routes-list').innerHTML = lines.length ? lines.map(l => {
+    const tripCount = trips.filter(t => t.line_id === l.line_id).length;
+    const stopCount = stops.filter(s => (s.line_ids || []).includes(l.line_id)).length;
+    return `
+    <tr><td class="mono">${l.line_number}</td><td class="mono">${tripCount}</td><td class="mono">${stopCount}</td>
+    <td>${l.accessibility_required ? '<span class="tag tag-accent-2">נגיש</span>' : '—'}</td>
+    <td>${l.short_line_flag ? '<span class="tag tag-neutral">כן</span>' : '—'}</td>
+    <td>${l.active_diversion_id ? '<span class="tag tag-accent">פעיל</span>' : '—'}</td></tr>`;
+  }).join('') : '<tr><td colspan="6">אין קווים</td></tr>';
+}
+
+/* ---------- Reassignment ---------- */
+async function refreshReassignment() {
+  const trips = await getJSON('/trips?status=planned');
+  const lines = await getJSON('/lines');
+  const lineNum = id => lines.find(l => l.line_id === id)?.line_number ?? id;
+  const open = trips.filter(t => !t.driver_id);
+  document.getElementById('open-trip-list').innerHTML = open.length ? open.map(t => `
+    <div class="card card-pad" style="cursor:pointer" onclick="selectReassignTrip('${t.trip_id}')">
+      קו ${lineNum(t.line_id)} — ${timeOf(t.plan_start_time)}
+    </div>`).join('') : '<p class="card-body">אין נסיעות פתוחות</p>';
+}
+
+async function selectReassignTrip(tripId) {
+  const detail = document.getElementById('reassign-detail');
+  detail.innerHTML = '<p class="card-body">טוען הצעת AI…</p>';
+  const candidates = await getJSON(`/trips/${tripId}/candidates`);
+  if (!candidates.length) { detail.innerHTML = '<p class="card-body">אין נהג זמין להצעה.</p>'; return; }
+  const best = candidates[0];
+  detail.innerHTML = `
+    <div class="card-title" style="font-size:15px">מועמד AI: ${best.full_name}</div>
+    <p class="card-body"><b>Blast Radius (דטרמיניסטי):</b> ${best.blast_radius_summary}</p>
+    <button class="btn btn-primary" onclick="proposeAndApprove('${tripId}')">הצע ואשר</button>
+    <div id="reassign-status" style="margin-top:8px"></div>`;
+}
+
+async function proposeAndApprove(tripId) {
+  const proposed = await getJSON(`/trips/${tripId}/propose-reassignment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const approved = await getJSON(`/reassignments/${proposed.reassignment_id}/approve`, { method: 'POST' });
+  document.getElementById('reassign-status').innerHTML = `<span class="tag tag-accent-2">אושר — ${approved.status}</span>`;
+  await refreshReassignment();
+}
+
+/* ---------- Diversion ---------- */
+async function refreshDiversion() {
+  const incidents = await getJSON('/incidents?status=active');
+  document.getElementById('incident-list').innerHTML = incidents.length ? incidents.map(i => `
+    <div class="card card-pad" style="cursor:pointer" onclick="selectIncident('${i.incident_id}')">
+      <span class="tag tag-accent">${i.source}</span> ${i.location_desc || 'ללא תיאור'}
+    </div>`).join('') : '<p class="card-body">אין אירועים פעילים</p>';
+}
+
+async function createIncident() {
+  const source = document.getElementById('inc-source').value;
+  const location_desc = document.getElementById('inc-desc').value;
+  await getJSON('/incidents', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, location_desc, affected_line_ids: [] }) });
+  document.getElementById('inc-desc').value = '';
+  await refreshDiversion();
+}
+
+async function selectIncident(incidentId) {
+  const lines = await getJSON('/lines');
+  const detail = document.getElementById('diversion-detail');
+  detail.innerHTML = `
+    <div class="field"><label>קו מושפע</label><select class="input" id="div-line">${lines.map(l => `<option value="${l.line_id}">${l.line_number}</option>`).join('')}</select></div>
+    <div class="field" style="margin-top:8px"><label>זמן נוסף משוער (דק')</label><input class="input" id="div-time" type="number" value="8"></div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="proposeDiversion('${incidentId}')">הצע תמרון</button>
+    <div id="diversion-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>`;
+  await loadDiversionsFor(incidentId);
+}
+
+async function proposeDiversion(incidentId) {
+  const line_id = document.getElementById('div-line').value;
+  const estimated_added_time = Number(document.getElementById('div-time').value);
+  await getJSON('/diversions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ line_id, incident_id: incidentId, estimated_added_time, skipped_stops: [] }) });
+  await loadDiversionsFor(incidentId);
+}
+
+async function loadDiversionsFor(incidentId) {
+  const lines = await getJSON('/lines');
+  const lineNum = id => lines.find(l => l.line_id === id)?.line_number ?? id;
+  const diversions = await getJSON(`/diversions?incident_id=${incidentId}`);
+  document.getElementById('diversion-list').innerHTML = diversions.length ? diversions.map(d => `
+    <div class="card card-pad">
+      קו ${lineNum(d.line_id)} · +${d.estimated_added_time ?? '?'} דק'
+      ${d.approval_status === 'approved'
+        ? '<span class="tag tag-accent-2">אושר</span>'
+        : `<button class="btn btn-primary" onclick="approveDiversion('${d.diversion_id}', this, '${incidentId}')">אשר תמרון</button>`}
+    </div>`).join('') : '<p class="card-body" style="font-size:12px">אין הצעות תמרון עדיין לאירוע זה.</p>';
+}
+
+async function approveDiversion(id, btn, incidentId) {
+  await getJSON(`/diversions/${id}/approve`, { method: 'POST' });
+  await loadDiversionsFor(incidentId);
+}
+
+/* ---------- Search / manual assign ---------- */
+async function refreshSearch() {
+  const trips = await getJSON('/trips?status=planned');
+  const lines = await getJSON('/lines');
+  const lineNum = id => lines.find(l => l.line_id === id)?.line_number ?? id;
+  const open = trips.filter(t => !t.driver_id);
+  const sel = document.getElementById('search-trip-select');
+  sel.innerHTML = open.map(t => `<option value="${t.trip_id}">קו ${lineNum(t.line_id)} — ${timeOf(t.plan_start_time)}</option>`).join('') || '<option>אין נסיעות פתוחות</option>';
+  if (open.length) searchDrivers();
+}
+
+async function searchDrivers() {
+  const tripId = document.getElementById('search-trip-select').value;
+  if (!tripId) return;
+  const trip = await getJSON(`/trips/${tripId}`);
+  const start = trip.plan_start_time, end = trip.plan_end_time;
+  const drivers = await getJSON(`/drivers/available?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`);
+  document.getElementById('search-results').innerHTML = drivers.length ? drivers.map(d => `
+    <tr><td>${d.full_name}</td><td><span class="tag tag-accent-2">${d.license_type}</span></td>
+    <td><button class="btn btn-primary" onclick="manualAssign('${tripId}','${d.driver_id}')">שבץ ידנית</button></td></tr>
+  `).join('') : '<tr><td colspan="3">אין נהגים זמינים</td></tr>';
+}
+
+async function manualAssign(tripId, driverId) {
+  await getJSON(`/trips/${tripId}/assign`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ driver_id: driverId }) });
+  await refreshSearch();
+}
+
+/* ---------- Close trip ---------- */
+const CLOSE_REASONS = {
+  trip_burn: ['mechanical_failure', 'route_blocking_incident', 'driver_awol_unresolved', 'other'],
+  trip_no_show: ['no_driver_available', 'no_vehicle_available', 'other'],
+};
+async function refreshCloseTrip() {
+  const trips = await getJSON('/trips?status=planned');
+  const lines = await getJSON('/lines');
+  const lineNum = id => lines.find(l => l.line_id === id)?.line_number ?? id;
+  const sel = document.getElementById('close-trip-select');
+  sel.innerHTML = trips.map(t => `<option value="${t.trip_id}">קו ${lineNum(t.line_id)} — ${timeOf(t.plan_start_time)}</option>`).join('');
+  renderCloseReasons();
+}
+function renderCloseReasons() {
+  const outcome = document.getElementById('close-outcome').value;
+  document.getElementById('close-reason').innerHTML = CLOSE_REASONS[outcome].map(r => `<option value="${r}">${r}</option>`).join('');
+}
+async function closeSelectedTrip() {
+  const tripId = document.getElementById('close-trip-select').value;
+  const status = document.getElementById('close-outcome').value;
+  const closure_reason = document.getElementById('close-reason').value;
+  try {
+    await getJSON(`/trips/${tripId}/close`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, closure_reason }) });
+    document.getElementById('close-result').innerHTML = '<span class="tag tag-accent-2">הנסיעה נסגרה ותועדה</span>';
+    await refreshCloseTrip();
+  } catch (e) {
+    document.getElementById('close-result').innerHTML = `<span class="tag tag-accent">שגיאה: ${e.message}</span>`;
+  }
+}
+
+/* ---------- Comms ---------- */
+async function refreshComms() {
+  const drivers = await getJSON('/drivers');
+  const sel = document.getElementById('comms-driver-select');
+  if (!sel.dataset.filled) {
+    sel.innerHTML = drivers.map(d => `<option value="${d.driver_id}">${d.full_name}</option>`).join('');
+    sel.dataset.filled = '1';
+  }
+  const driverId = sel.value;
+  if (!driverId) return;
+  const msgs = await getJSON(`/drivers/${driverId}/messages`);
+  document.getElementById('comms-log').innerHTML = msgs.length
+    ? msgs.map(m => `<div class="msg ${m.direction}">[${m.channel}] ${m.body}</div>`).join('')
+    : '<p class="card-body">אין הודעות</p>';
+}
+
+/* ---------- KPI ---------- */
+async function refreshKpi() {
+  const [vehicles, trips, drivers, reassignments] = await Promise.all([
+    getJSON('/vehicles'), getJSON('/trips'), getJSON('/drivers'), getJSON('/reassignments'),
+  ]);
+  const executed = reassignments.filter(r => r.status === 'executed').length;
+  const cards = [
+    { k: 'רכבים עם GPS תקין', v: `${vehicles.filter(v => v.gps_confidence_score >= 60).length} / ${vehicles.length}`, live: true },
+    { k: 'נהגים פעילים', v: drivers.filter(d => d.status === 'active').length, live: true },
+    { k: 'גלגולים שבוצעו (סה"כ)', v: executed, live: true },
+    { k: 'Blast Radius Miss Rate', v: '— (דורש Record & Replay)', live: false },
+    { k: 'חיסכון זמן סדרן (יעד)', v: '-70%', live: false },
+    { k: 'החזר השקעה משוער (יעד)', v: '12–18 חוד\'', live: false },
+  ];
+  document.getElementById('kpi-grid').innerHTML = cards.map(c => `
+    <div class="card elev-sm card-pad">
+      <div class="card-kicker">${c.k} ${c.live ? '<span class="tag tag-accent-2" style="font-size:10px">חי</span>' : '<span class="tag tag-neutral" style="font-size:10px">יעד תכנון</span>'}</div>
+      <div class="kpi-num" style="font-size:26px">${c.v}</div>
+    </div>`).join('');
+}
+
+/* ---------- boot ---------- */
+initMap();
+showScreen('overview');
+setInterval(() => refreshScreen(currentScreen), 5000);
+</script>
+</body>
+</html>
