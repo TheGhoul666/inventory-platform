@@ -10,6 +10,7 @@ The token is a standard Supabase JWT sent in the Authorization header:
 
 Verification is LOCAL — uses SUPABASE_JWT_SECRET, no network call.
 """
+import logging
 import uuid
 from typing import Annotated
 
@@ -19,6 +20,7 @@ from jose import JWTError
 
 from app.auth.jwt_handler import extract_user_from_token
 
+logger = logging.getLogger(__name__)
 security = HTTPBearer(auto_error=True)
 
 
@@ -52,10 +54,10 @@ async def get_current_user(
         data = extract_user_from_token(credentials.credentials)
         return CurrentUser(data)
     except (JWTError, KeyError, ValueError) as _jwt_exc:
-        import traceback; traceback.print_exc()
+        logger.warning("Token verification failed", exc_info=_jwt_exc)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid or expired Supabase token: {_jwt_exc}",
+            detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
