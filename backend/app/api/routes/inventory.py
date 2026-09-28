@@ -214,6 +214,22 @@ async def _insert_transaction(sb: Any, txn: dict) -> str:
     return txn_id
 
 
+async def _apply_quantity_change(sb: Any, item_id: uuid.UUID, expected_qty: Decimal, new_qty: Decimal) -> None:
+    """
+    Conditional UPDATE: only applies if quantity hasn't changed since we read
+    it. Prevents lost updates when two mutations race on the same item.
+    Every code path that mutates item.quantity must go through this.
+    """
+    updated = await sb.table("inventory_items")\
+        .update({"quantity": str(new_qty)})\
+        .eq("id", str(item_id))\
+        .eq("quantity", str(expected_qty))\
+        .select("id")\
+        .execute()
+    if not updated.data:
+        raise HTTPException(status_code=409, detail="Stock changed concurrently — please retry")
+
+
 @router.post("/transactions/issue", status_code=201)
 async def issue_item(
     body: IssueRequest,
@@ -232,15 +248,7 @@ async def issue_item(
         )
 
     new_qty = qty - body.quantity
-    # Conditional UPDATE: only applies if quantity hasn't changed since we read it (prevents TOCTOU race)
-    updated = await sb.table("inventory_items")\
-        .update({"quantity": str(new_qty)})\
-        .eq("id", str(body.item_id))\
-        .eq("quantity", str(qty))\
-        .select("id")\
-        .execute()
-    if not updated.data:
-        raise HTTPException(status_code=409, detail="Stock changed concurrently — please retry")
+    await _apply_quantity_change(sb, body.item_id, qty, new_qty)
 
     txn_id = await _insert_transaction(sb, {
         "item_id": str(body.item_id),
@@ -286,7 +294,7 @@ async def restock_item(
     qty = Decimal(str(item["quantity"]))
     new_qty = qty + body.quantity
 
-    await sb.table("inventory_items").update({"quantity": str(new_qty)}).eq("id", str(body.item_id)).execute()
+    await _apply_quantity_change(sb, body.item_id, qty, new_qty)
 
     txn_id = await _insert_transaction(sb, {
         "item_id": str(body.item_id),
@@ -325,8 +333,14 @@ async def transfer_item(
     current_user: CurrentUser = Depends(require_permission("inventory:write")),
     sb: Any = Depends(get_supabase_db),
 ):
+    if body.source_item_id == body.dest_item_id:
+        raise HTTPException(status_code=422, detail="Source and destination items must differ")
+
     source = await _get_item_or_404(sb, body.source_item_id)
     dest = await _get_item_or_404(sb, body.dest_item_id)
+
+    if source["sku"] != dest["sku"]:
+        raise HTTPException(status_code=422, detail="Transfer source and destination must be the same SKU")
 
     if source["warehouse_id"] == str(body.dest_warehouse_id):
         raise HTTPException(status_code=422, detail="Source and destination warehouses must differ")
@@ -345,8 +359,14 @@ async def transfer_item(
     dest_qty = Decimal(str(dest["quantity"]))
     new_dest = dest_qty + body.quantity
 
-    await sb.table("inventory_items").update({"quantity": str(new_src)}).eq("id", str(body.source_item_id)).execute()
-    await sb.table("inventory_items").update({"quantity": str(new_dest)}).eq("id", str(body.dest_item_id)).execute()
+    await _apply_quantity_change(sb, body.source_item_id, src_qty, new_src)
+    try:
+        await _apply_quantity_change(sb, body.dest_item_id, dest_qty, new_dest)
+    except HTTPException:
+        # Destination leg failed after source was already debited — put the
+        # source quantity back rather than leaving stock stranded mid-transfer.
+        await _apply_quantity_change(sb, body.source_item_id, new_src, src_qty)
+        raise
 
     txn_id = await _insert_transaction(sb, {
         "item_id": str(body.source_item_id),
@@ -478,7 +498,7 @@ async def rollback_transaction(
         if new_qty < 0:
             raise HTTPException(status_code=422, detail="Rollback would result in negative stock")
 
-    await sb.table("inventory_items").update({"quantity": str(new_qty)}).eq("id", item["id"]).execute()
+    await _apply_quantity_change(sb, uuid.UUID(item["id"]), qty, new_qty)
     await sb.table("inventory_transactions").update({"status": "ROLLED_BACK"}).eq("id", str(tx_id)).execute()
 
     rollback_id = await _insert_transaction(sb, {

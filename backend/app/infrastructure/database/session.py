@@ -23,8 +23,6 @@ from app.config.settings import get_settings
 settings = get_settings()
 
 _ssl_ctx = ssl.create_default_context()
-_ssl_ctx.check_hostname = False
-_ssl_ctx.verify_mode = ssl.CERT_NONE
 
 engine = create_async_engine(
     settings.DATABASE_URL,

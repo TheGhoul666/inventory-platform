@@ -24,6 +24,7 @@ from app.domain.rules.inventory_rules import (
     assert_sufficient_stock,
     assert_positive_quantity,
     assert_transfer_different_warehouses,
+    assert_transfer_same_item,
 )
 from app.domain.exceptions import (
     InsufficientStockError,
@@ -218,6 +219,8 @@ class InventoryService:
         when two concurrent transfers go in opposite directions.
         """
         assert_positive_quantity(dto.quantity)
+        if dto.source_item_id == dto.dest_item_id:
+            raise InvalidTransactionError("Transfer source and destination items must differ")
         assert_transfer_different_warehouses(
             str(dto.source_warehouse_id), str(dto.dest_warehouse_id)
         )
@@ -234,6 +237,7 @@ class InventoryService:
         source = first if first.id == dto.source_item_id else second
         dest = first if first.id == dto.dest_item_id else second
 
+        assert_transfer_same_item(source.sku, dest.sku)
         assert_sufficient_stock(
             item_id=str(source.id),
             current_quantity=source.quantity,
