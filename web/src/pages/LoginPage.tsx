@@ -87,28 +87,28 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[5fr_7fr]">
-      <aside className="hidden flex-col justify-between bg-forest p-12 text-ivory lg:flex">
+      <aside className="hidden flex-col justify-between bg-sage p-12 text-ink lg:flex">
         <div className="flex items-center gap-3">
-          <Bus className="h-7 w-7" aria-hidden="true" />
-          <span className="font-serif text-xl">{t("nav.appName")}</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white" aria-hidden="true"><Bus className="h-6 w-6" /></span>
+          <span className="text-xl font-extrabold">{t("nav.appName")}</span>
         </div>
         <div>
-          <h1 className="font-serif text-5xl leading-tight">{t("auth.welcomeBack")}</h1>
-          <p className="mt-4 max-w-sm text-lg text-[#d6e2cf]">{t("auth.subtitle")}</p>
+          <h1 className="text-5xl font-extrabold leading-tight">{t("auth.welcomeBack")}</h1>
+          <p className="mt-4 max-w-sm text-lg text-brand-700">{t("auth.subtitle")}</p>
         </div>
-        <div aria-hidden="true" className="h-px w-24 bg-white/30" />
+        <div aria-hidden="true" className="h-1 w-16 rounded-full bg-clay" />
       </aside>
 
       <main className="flex min-h-screen items-center justify-center p-6 lg:min-h-0">
         <div className="w-full max-w-md">
         <div className="mb-6 lg:hidden">
-          <h1 className="font-serif text-3xl text-ink">{t("auth.welcomeBack")}</h1>
+          <h1 className="text-3xl text-ink">{t("auth.welcomeBack")}</h1>
           <p className="mt-1 text-sm text-slate-400">{t("auth.subtitle")}</p>
         </div>
 
         <div className="card p-8">
           {/* Tabs */}
-          <div role="tablist" className="flex rounded-lg bg-surface-700 p-1 mb-6">
+          <div role="tablist" className="flex rounded-full bg-surface-700 p-1 mb-6">
             <button
               type="button"
               role="tab"
@@ -116,7 +116,7 @@ export function LoginPage() {
               aria-selected={tab === "signin"}
               aria-controls="panel-signin"
               onClick={() => setTab("signin")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-full transition-colors ${
                 tab === "signin"
                   ? "bg-brand-600 text-white"
                   : "text-slate-400 hover:text-ink"
@@ -131,7 +131,7 @@ export function LoginPage() {
               aria-selected={tab === "signup"}
               aria-controls="panel-signup"
               onClick={() => setTab("signup")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-full transition-colors ${
                 tab === "signup"
                   ? "bg-brand-600 text-white"
                   : "text-slate-400 hover:text-ink"
@@ -184,7 +184,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors mt-2"
+                className="btn-primary mt-2 w-full py-2.5"
               >
                 {loading ? t("auth.signingIn") : t("auth.submitSignIn")}
               </button>
@@ -279,7 +279,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors mt-2"
+                className="btn-primary mt-2 w-full py-2.5"
               >
                 {loading ? t("auth.creatingAccount") : t("auth.signUp")}
               </button>

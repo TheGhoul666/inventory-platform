@@ -150,8 +150,8 @@ export function AnalyticsPage() {
                 <AreaChart data={emaData}>
                   <defs>
                     <linearGradient id="emaGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2d6a2b" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#2d6a2b" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#3f6b4a" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3f6b4a" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#dde3f0" />
@@ -169,7 +169,7 @@ export function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="ema"
-                    stroke="#2d6a2b"
+                    stroke="#3f6b4a"
                     fill="url(#emaGrad)"
                     strokeWidth={2}
                     name={t("analytics.emaSeries")}

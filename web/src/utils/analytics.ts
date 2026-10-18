@@ -1,6 +1,7 @@
 import type { AnomalyResult, EmaPoint } from "@/types";
 
 export interface TxnLike {
+  item_id?: string;
   transaction_type?: string;
   type?: string;
   quantity_delta: number | string;
@@ -57,4 +58,57 @@ export function detectAnomaly(series: { qty: number }[], itemId: string): Anomal
     ratio: Math.round(ratio * 100) / 100,
     is_anomaly: rate30 > 0 && ratio >= 2,
   };
+}
+
+/** Average units consumed per day, per item, over the last `days` days. */
+export function consumptionRateByItem(txns: TxnLike[], days: number): Map<string, number> {
+  const totals = new Map<string, number>();
+  for (const t of txns) {
+    if (!t.item_id || !CONSUMING.has(t.transaction_type ?? t.type ?? "")) continue;
+    totals.set(t.item_id, (totals.get(t.item_id) ?? 0) + Math.abs(Number(t.quantity_delta)));
+  }
+  const rates = new Map<string, number>();
+  totals.forEach((total, id) => rates.set(id, total / days));
+  return rates;
+}
+
+export interface StockLevel {
+  id: string;
+  name: string;
+  sku: string;
+  unit: string;
+  quantity: number;
+  low: number;
+  critical: number;
+  /** Bar scale: the quantity that fills the bar. */
+  scale: number;
+  daysLeft: number | null;
+  status: "critical" | "low" | "ok";
+}
+
+export function toStockLevel(
+  item: { id: string; name: string; sku: string; unit?: string; quantity: number | string; low_stock_threshold: number | string; critical_stock_threshold: number | string },
+  rates: Map<string, number>,
+): StockLevel {
+  const quantity = Number(item.quantity);
+  const low = Number(item.low_stock_threshold);
+  const critical = Number(item.critical_stock_threshold);
+  return {
+    id: item.id,
+    name: item.name,
+    sku: item.sku,
+    unit: item.unit ?? "",
+    quantity,
+    low,
+    critical,
+    scale: Math.max(low * 2.5, quantity, 1),
+    daysLeft: predictedDaysLeft(quantity, rates.get(item.id) ?? 0),
+    status: quantity <= critical ? "critical" : quantity <= low ? "low" : "ok",
+  };
+}
+
+/** Items closest to running out first (quantity relative to the low threshold). */
+export function sortByUrgency(levels: StockLevel[]): StockLevel[] {
+  const urgency = (l: StockLevel) => l.quantity / Math.max(l.low, 1);
+  return [...levels].sort((a, b) => urgency(a) - urgency(b));
 }

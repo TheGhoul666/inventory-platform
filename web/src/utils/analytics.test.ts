@@ -25,3 +25,31 @@ describe("analytics", () => {
     expect(detectAnomaly(series.map(() => ({ qty: 1 })), "x").is_anomaly).toBe(false);
   });
 });
+
+import { consumptionRateByItem, sortByUrgency, toStockLevel } from "./analytics";
+
+describe("dashboard stock levels", () => {
+  const item = (id: string, qty: number, low = 20, crit = 8) => ({
+    id, name: id, sku: id, unit: "pcs", quantity: qty, low_stock_threshold: low, critical_stock_threshold: crit,
+  });
+
+  it("computes per-item rate and days left", () => {
+    const rates = consumptionRateByItem(
+      [
+        { item_id: "a", transaction_type: "ISSUE", quantity_delta: 14, created_at: "2026-10-01T00:00:00Z" },
+        { item_id: "a", transaction_type: "RESTOCK", quantity_delta: 99, created_at: "2026-10-02T00:00:00Z" },
+      ],
+      14,
+    );
+    expect(rates.get("a")).toBe(1);
+    expect(toStockLevel(item("a", 10), rates).daysLeft).toBe(10);
+    expect(toStockLevel(item("b", 10), rates).daysLeft).toBeNull();
+  });
+
+  it("classifies status and sorts the most urgent first", () => {
+    const rates = new Map<string, number>();
+    const levels = [item("ok", 90), item("low", 15), item("crit", 4)].map((i) => toStockLevel(i, rates));
+    expect(levels.map((l) => l.status)).toEqual(["ok", "low", "critical"]);
+    expect(sortByUrgency(levels).map((l) => l.id)).toEqual(["crit", "low", "ok"]);
+  });
+});

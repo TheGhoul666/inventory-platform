@@ -41,33 +41,38 @@ export function Sidebar() {
     ({ permission }) => permission === null || hasPermission(permission)
   );
 
+  const { user, roles } = useAuthStore();
+  const displayName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? "";
+
   return (
     <aside
       className={cn(
-        "flex flex-col h-full bg-forest text-ivory transition-all duration-300",
-        sidebarCollapsed ? "w-16" : "w-64"
+        "flex h-full flex-col rounded-2xl border border-surface-600 bg-surface-800 transition-all duration-300",
+        sidebarCollapsed ? "w-[72px]" : "w-60"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-white/15">
+      <div className="flex h-16 items-center justify-between px-4">
         {!sidebarCollapsed && (
-          <div className="flex items-center gap-2">
-            <Bus className="h-6 w-6 text-ivory" aria-hidden="true" />
-            <span className="font-serif text-lg tracking-tight text-ivory">{t("nav.appName")}</span>
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white" aria-hidden="true">
+              <Bus className="h-5 w-5" />
+            </span>
+            <span className="text-lg font-extrabold tracking-tight text-ink">{t("nav.appName")}</span>
           </div>
         )}
         <button
           onClick={toggleSidebar}
-          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={sidebarCollapsed ? t("a11y.expandSidebar") : t("a11y.collapseSidebar")}
           aria-expanded={!sidebarCollapsed}
-          className="p-1.5 rounded-lg text-[#d6e2cf] hover:text-white hover:bg-white/10 transition-colors ms-auto"
+          className="ms-auto rounded-full p-1.5 text-slate-400 transition-colors hover:bg-surface-700 hover:text-ink"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform rtl:rotate-180", sidebarCollapsed && "rotate-180")} />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav aria-label="Main" className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
+      <nav aria-label="Main" className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
         {navItems.map(({ path, icon: Icon, label }) => (
           <NavLink
             key={path}
@@ -76,28 +81,38 @@ export function Sidebar() {
             title={sidebarCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors group",
-                isActive
-                  ? "bg-ivory text-forest font-semibold"
-                  : "text-[#d6e2cf] hover:text-white hover:bg-white/10"
+                "flex items-center gap-3 rounded-full px-4 py-2.5 text-[15px] font-medium transition-colors",
+                isActive ? "bg-brand-600 font-semibold text-white" : "text-slate-400 hover:bg-surface-700 hover:text-ink"
               )
             }
           >
-            <Icon className="h-5 w-5 shrink-0" />
+            <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
             {!sidebarCollapsed && <span>{label}</span>}
           </NavLink>
         ))}
       </nav>
 
-      {/* Bottom settings */}
-      <div className="p-2 border-t border-white/15">
+      {/* Settings + current user */}
+      <div className="space-y-2 p-3">
         <NavLink
           to="/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#d6e2cf] hover:text-white hover:bg-white/10 transition-colors"
+          title={sidebarCollapsed ? t("nav.settings") : undefined}
+          className={({ isActive }) =>
+            cn(
+              "flex items-center gap-3 rounded-full px-4 py-2.5 text-[15px] font-medium transition-colors",
+              isActive ? "bg-brand-600 font-semibold text-white" : "text-slate-400 hover:bg-surface-700 hover:text-ink"
+            )
+          }
         >
-          <Settings className="h-5 w-5 shrink-0" />
+          <Settings className="h-5 w-5 shrink-0" aria-hidden="true" />
           {!sidebarCollapsed && <span>{t("nav.settings")}</span>}
         </NavLink>
+        {!sidebarCollapsed && user && (
+          <div className="rounded-2xl bg-sage px-4 py-3 text-sm leading-snug text-brand-700">
+            <p className="truncate font-bold">{displayName}</p>
+            <p>{roles[0] ?? "Viewer"}</p>
+          </div>
+        )}
       </div>
     </aside>
   );

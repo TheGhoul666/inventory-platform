@@ -7,10 +7,10 @@
     @apply rounded-2xl border border-surface-600 bg-surface-800 shadow-card;
   }
   .btn-primary {
-    @apply rounded-lg bg-brand-600 text-white font-semibold tracking-wide transition-colors hover:bg-brand-700 active:bg-forest disabled:cursor-not-allowed disabled:opacity-50;
+    @apply rounded-full bg-clay text-white font-semibold transition-colors hover:bg-[#9a3817] active:bg-[#862f13] disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-secondary {
-    @apply rounded-lg border border-surface-600 bg-surface-800 text-slate-300 transition-colors hover:bg-surface-700 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+    @apply rounded-full border border-surface-600 bg-surface-800 text-slate-300 transition-colors hover:bg-surface-700 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
   }
 }
 
@@ -34,7 +34,7 @@
   }
 
   h1, h2, h3 {
-    font-family: theme("fontFamily.serif");
+    font-weight: 800;
     letter-spacing: -0.01em;
   }
 
