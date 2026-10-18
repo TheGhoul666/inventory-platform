@@ -27,21 +27,23 @@ export function Header() {
         onClick={() => i18n.changeLanguage(isHe ? "en" : "he")}
         className="btn-secondary flex h-9 w-9 items-center justify-center text-xs font-bold"
         title={isHe ? "Switch to English" : "עבור לעברית"}
-        aria-label={isHe ? "Switch to English" : "עבור לעברית"}
       >
-        {isHe ? "EN" : "עב"}
+        <span aria-hidden="true">{isHe ? "EN" : "עב"}</span>
+        <span className="sr-only">{isHe ? "Switch to English" : "עבור לעברית"}</span>
       </button>
 
       {/* Alert indicator */}
       <button
         onClick={() => navigate("/alerts")}
         title={t("alerts.title")}
-        aria-label={t("alerts.title")}
         className="btn-secondary relative flex h-9 w-9 items-center justify-center"
       >
         <Bell className="h-[18px] w-[18px]" aria-hidden="true" />
+        <span className="sr-only">
+          {openAlertCount > 0 ? `${t("alerts.title")} (${openAlertCount})` : t("alerts.title")}
+        </span>
         {openAlertCount > 0 && (
-          <span className="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-clay px-1 text-xs font-bold text-white">
+          <span aria-hidden="true" className="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-clay px-1 text-xs font-bold text-white">
             {openAlertCount > 9 ? "9+" : openAlertCount}
           </span>
         )}

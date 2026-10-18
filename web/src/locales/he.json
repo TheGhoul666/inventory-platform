@@ -118,7 +118,23 @@
       "RELEASE": "שחרור"
     },
     "attention_two": "{{count}} פריטים דורשים תשומת לב היום.",
-    "attention_many": "{{count}} פריטים דורשים תשומת לב היום."
+    "attention_many": "{{count}} פריטים דורשים תשומת לב היום.",
+    "attentionUrgent_one": "פריט אחד דורש תשומת לב היום. ההזמנה הדחופה ביותר: {{name}}.",
+    "attentionUrgent_other": "{{count}} פריטים דורשים תשומת לב היום. ההזמנה הדחופה ביותר: {{name}}.",
+    "attentionUrgent_two": "{{count}} פריטים דורשים תשומת לב היום. ההזמנה הדחופה ביותר: {{name}}.",
+    "attentionUrgent_many": "{{count}} פריטים דורשים תשומת לב היום. ההזמנה הדחופה ביותר: {{name}}.",
+    "kpiValue": "ערך מלאי",
+    "kpiValueSub": "בכל המחסנים",
+    "deltaUp": "עלה ב-{{n}} מאז אתמול",
+    "deltaDown": "ירד ב-{{n}} מאז אתמול",
+    "deltaSame": "ללא שינוי",
+    "addItem": "הוספת פריט",
+    "consumptionTitle": "צריכת {{name}} · 14 ימים אחרונים",
+    "previousWeek": "שבוע קודם",
+    "lastWeek": "שבוע אחרון",
+    "surge": "חריגה: פי {{ratio}} מהשבוע הקודם. כדאי לבדוק אם יש תקלה בצי.",
+    "steady": "הצריכה יציבה לעומת השבוע הקודם.",
+    "consumptionAria": "צריכה יומית ב-14 ימים. 7 הימים האחרונים הם פי {{ratio}} מ-7 הימים שלפניהם."
   },
   "inventory": {
     "title": "מלאי",

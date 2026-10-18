@@ -116,7 +116,21 @@
       "WRITE_OFF": "Write-off",
       "RESERVATION": "Reservation",
       "RELEASE": "Release"
-    }
+    },
+    "attentionUrgent_one": "{{count}} item needs attention today. Most urgent order: {{name}}.",
+    "attentionUrgent_other": "{{count}} items need attention today. Most urgent order: {{name}}.",
+    "kpiValue": "Stock value",
+    "kpiValueSub": "Across all warehouses",
+    "deltaUp": "Up {{n}} since yesterday",
+    "deltaDown": "Down {{n}} since yesterday",
+    "deltaSame": "No change",
+    "addItem": "Add item",
+    "consumptionTitle": "{{name}} usage · last 14 days",
+    "previousWeek": "Previous week",
+    "lastWeek": "Last week",
+    "surge": "Surge: {{ratio}}x last week's usage. Worth checking the fleet for a fault.",
+    "steady": "Usage is steady compared with last week.",
+    "consumptionAria": "Daily usage over 14 days. Last 7 days are {{ratio}} times the previous 7."
   },
   "inventory": {
     "title": "Inventory",

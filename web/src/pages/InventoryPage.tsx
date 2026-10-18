@@ -2,6 +2,7 @@
  * Inventory page — searchable, filterable table with issue/restock/transfer/add actions.
  */
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Search,
@@ -19,6 +20,7 @@ import toast from "react-hot-toast";
 import { inventoryService, warehouseService, busService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { StockBadge } from "@/components/ui/StockBadge";
+import { StockBar } from "@/components/ui/StockBar";
 import { useTranslation } from "react-i18next";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Field } from "@/components/ui/Field";
@@ -618,7 +620,8 @@ export function InventoryPage() {
   const [issueTarget, setIssueTarget] = useState<InventoryItem | null>(null);
   const [restockTarget, setRestockTarget] = useState<InventoryItem | null>(null);
   const [transferTarget, setTransferTarget] = useState<InventoryItem | null>(null);
-  const [showAddItem, setShowAddItem] = useState(false);
+  const location = useLocation();
+  const [showAddItem, setShowAddItem] = useState(Boolean((location.state as { create?: boolean } | null)?.create));
   const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
   const [writeOffTarget, setWriteOffTarget] = useState<InventoryItem | null>(null);
 
@@ -795,6 +798,13 @@ export function InventoryPage() {
                         lowThreshold={item.low_stock_threshold}
                         criticalThreshold={item.critical_stock_threshold}
                         unit={item.unit}
+                      />
+                      <StockBar
+                        className="ms-auto mt-2 w-28"
+                        quantity={Number(item.quantity)}
+                        low={Number(item.low_stock_threshold)}
+                        critical={Number(item.critical_stock_threshold)}
+                        label={`${item.quantity} ${item.unit}`}
                       />
                     </td>
                     <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
