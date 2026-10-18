@@ -44,7 +44,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col h-full bg-surface-800 border-r border-surface-700 transition-all duration-300 rtl:border-r-0 rtl:border-l",
+        "flex flex-col h-full bg-surface-800 border-e border-surface-700 transition-all duration-300",
         sidebarCollapsed ? "w-16" : "w-64"
       )}
     >
@@ -58,24 +58,27 @@ export function Sidebar() {
         )}
         <button
           onClick={toggleSidebar}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-700 transition-colors ml-auto rtl:ml-0 rtl:mr-auto"
+          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!sidebarCollapsed}
+          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-700 transition-colors ms-auto"
         >
-          <ChevronLeft className={cn("h-4 w-4 transition-transform", sidebarCollapsed && "rotate-180")} />
+          <ChevronLeft className={cn("h-4 w-4 transition-transform rtl:rotate-180", sidebarCollapsed && "rotate-180")} />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
+      <nav aria-label="Main" className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
         {navItems.map(({ path, icon: Icon, label }) => (
           <NavLink
             key={path}
             to={path}
             end={path === "/"}
+            title={sidebarCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group",
                 isActive
-                  ? "bg-brand-600 text-white"
+                  ? "bg-brand-600 text-white shadow-md shadow-brand-900/40"
                   : "text-slate-400 hover:text-white hover:bg-surface-700"
               )
             }

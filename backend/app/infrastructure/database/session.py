@@ -26,16 +26,21 @@ _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.check_hostname = False
 _ssl_ctx.verify_mode = ssl.CERT_NONE
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    pool_size=settings.DATABASE_POOL_SIZE,
-    max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    pool_timeout=settings.DATABASE_POOL_TIMEOUT,
-    pool_pre_ping=True,
-    pool_recycle=1800,
-    echo=settings.DATABASE_ECHO,
-    connect_args={"ssl": _ssl_ctx},
-)
+if settings.DATABASE_URL.startswith("sqlite"):
+    # SQLite (unit tests): no connection pool tuning, no TLS.
+    _engine_kwargs: dict = {"echo": settings.DATABASE_ECHO}
+else:
+    _engine_kwargs = {
+        "pool_size": settings.DATABASE_POOL_SIZE,
+        "max_overflow": settings.DATABASE_MAX_OVERFLOW,
+        "pool_timeout": settings.DATABASE_POOL_TIMEOUT,
+        "pool_pre_ping": True,
+        "pool_recycle": 1800,
+        "echo": settings.DATABASE_ECHO,
+        "connect_args": {"ssl": _ssl_ctx},
+    }
+
+engine = create_async_engine(settings.DATABASE_URL, **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,

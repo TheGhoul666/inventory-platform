@@ -6,6 +6,7 @@ and a real PostgreSQL instance for integration/concurrency tests
 (controlled by TEST_DATABASE_URL environment variable).
 """
 import asyncio
+import os
 import uuid
 from decimal import Decimal
 from typing import AsyncGenerator
@@ -15,7 +16,17 @@ import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-from app.main import create_app
+# Settings are validated at import time; give tests safe defaults (never real credentials).
+for _k, _v in {
+    "SUPABASE_URL": "http://localhost:54321",
+    "SUPABASE_ANON_KEY": "test-anon-key",
+    "SUPABASE_SERVICE_ROLE_KEY": "test-service-key",
+    "SUPABASE_JWT_SECRET": "test-jwt-secret",
+    "DATABASE_URL": "sqlite+aiosqlite:///:memory:",
+}.items():
+    os.environ.setdefault(_k, _v)
+
+from app.main import create_app  # noqa: E402
 from app.infrastructure.database.base import Base
 from app.infrastructure.database.session import get_db
 from app.domain.models.user import User, Role, Permission
@@ -108,10 +119,20 @@ async def test_user(db_session, test_warehouse) -> User:
 
 @pytest_asyncio.fixture
 async def auth_headers(test_user) -> dict:
-    # Supabase auth is used in production; tests that need HTTP auth
-    # must supply a real Supabase token via TEST_SUPABASE_TOKEN env var.
-    import os
-    token = os.getenv("TEST_SUPABASE_TOKEN", "test-token-placeholder")
+    """Bearer header carrying a locally signed Supabase-style HS256 JWT."""
+    from jose import jwt
+
+    token = jwt.encode(
+        {
+            "sub": str(test_user.id),
+            "email": test_user.email,
+            "aud": "authenticated",
+            "app_metadata": {"roles": ["SuperAdmin"], "permissions": ["*"], "is_superadmin": True},
+            "user_metadata": {"username": test_user.username, "full_name": test_user.full_name},
+        },
+        os.environ["SUPABASE_JWT_SECRET"],
+        algorithm="HS256",
+    )
     return {"Authorization": f"Bearer {token}"}
 
 

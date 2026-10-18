@@ -150,7 +150,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
                   <div className="mt-1 bg-surface-700 border border-surface-600 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
                     {destItems.map((di) => (
                       <button key={di.id} onClick={() => setDestItem(di)}
-                        className="w-full text-left px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors">
+                        className="w-full text-start px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors">
                         <span className="text-white">{di.name}</span>
                         <span className="text-slate-400 text-xs tabular-nums">{di.available_quantity} {di.unit}</span>
                       </button>
@@ -217,7 +217,7 @@ function BusAssignModal({ item, onClose }: { item: InventoryItem; onClose: () =>
   const valid = !!busId && parseFloat(qty) > 0 && parseFloat(qty) <= item.available_quantity;
 
   return (
-    <Modal title={<><Bus className="inline h-4 w-4 mr-1.5 text-amber-400" />Assign to Bus: <span className="text-amber-400">{item.name}</span></>} onClose={onClose}>
+    <Modal title={<><Bus className="inline h-4 w-4 me-1.5 text-amber-400" />Assign to Bus: <span className="text-amber-400">{item.name}</span></>} onClose={onClose}>
       <div className="space-y-4">
         <div className="bg-surface-700 rounded-lg p-3 text-sm">
           <p className="text-slate-400 text-xs mb-0.5">Part</p>
@@ -398,7 +398,7 @@ export function WarehouseDetailPage() {
             {warehouse.address && ` · ${warehouse.address}`}
           </p>
         </div>
-        <div className="text-right text-sm text-slate-400">
+        <div className="text-end text-sm text-slate-400">
           <p className="text-2xl font-bold text-white">{total}</p>
           <p>parts tracked</p>
         </div>
@@ -406,12 +406,12 @@ export function WarehouseDetailPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
         <input
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="Search parts by name or SKU…"
-          className="w-full pl-9 pr-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+          className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
         />
       </div>
 
@@ -421,12 +421,12 @@ export function WarehouseDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">SKU</th>
-                <th className="px-4 py-3 text-left">Part Name</th>
-                <th className="px-4 py-3 text-right">Stock</th>
-                <th className="px-4 py-3 text-right">Reserved</th>
-                <th className="px-4 py-3 text-right">Available</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-start">SKU</th>
+                <th className="px-4 py-3 text-start">Part Name</th>
+                <th className="px-4 py-3 text-end">Stock</th>
+                <th className="px-4 py-3 text-end">Reserved</th>
+                <th className="px-4 py-3 text-end">Available</th>
+                <th className="px-4 py-3 text-end">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -459,7 +459,7 @@ export function WarehouseDetailPage() {
                         <p className="text-slate-500 text-xs">{item.supplier_name}</p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <StockBadge
                         quantity={item.quantity}
                         lowThreshold={item.low_stock_threshold}
@@ -467,13 +467,13 @@ export function WarehouseDetailPage() {
                         unit={item.unit}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
                       {item.reserved_quantity} {item.unit}
                     </td>
-                    <td className="px-4 py-3 text-right text-emerald-400 font-medium tabular-nums">
+                    <td className="px-4 py-3 text-end text-emerald-400 font-medium tabular-nums">
                       {item.available_quantity} {item.unit}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setBusTarget(item)}

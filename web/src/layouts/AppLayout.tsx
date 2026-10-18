@@ -27,10 +27,11 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen bg-surface-900 text-white overflow-hidden">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2">Skip to content</a>
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main id="main" className="flex-1 overflow-y-auto p-4 md:p-6">
           <Outlet />
         </main>
       </div>

@@ -86,7 +86,7 @@ function CreateWarehouseModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal title="Add Warehouse" onClose={onClose}>
-      <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[60vh] overflow-y-auto pe-1">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Name *">
             <input value={form.name} onChange={set("name")} placeholder="Main Depot" className={inputCls} />
@@ -205,13 +205,13 @@ export function WarehousesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("warehouses.code")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.name")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.city")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.country")}</th>
-                <th className="px-4 py-3 text-right">{t("warehouses.capacity")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.code")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.name")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.city")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.country")}</th>
+                <th className="px-4 py-3 text-end">{t("warehouses.capacity")}</th>
                 <th className="px-4 py-3 text-center">{t("warehouses.status")}</th>
-                <th className="px-4 py-3 text-right">{t("warehouses.actions")}</th>
+                <th className="px-4 py-3 text-end">{t("warehouses.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -242,7 +242,7 @@ export function WarehousesPage() {
                     <td className="px-4 py-3 text-white font-medium">{wh.name}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.city || "—"}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.country}</td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
                       {wh.capacity_sqm != null ? wh.capacity_sqm.toLocaleString() : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -256,7 +256,7 @@ export function WarehousesPage() {
                         {wh.is_active ? t("common.active") : t("common.inactive")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button
                         onClick={() =>
                           toggleMutation.mutate({ id: wh.id, is_active: !wh.is_active })

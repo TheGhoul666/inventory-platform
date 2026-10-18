@@ -292,7 +292,7 @@ function AddItemModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal title="Add Inventory Item" onClose={onClose}>
-      <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[60vh] overflow-y-auto pe-1">
         <div className="grid grid-cols-2 gap-3">
           <Field label="SKU *">
             <input value={form.sku} onChange={set("sku")} placeholder="BRK-001" className={inputCls} />
@@ -469,7 +469,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
                       <button
                         key={di.id}
                         onClick={() => setDestItem(di)}
-                        className="w-full text-left px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors"
+                        className="w-full text-start px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors"
                       >
                         <span className="text-white">{di.name}</span>
                         <span className="text-slate-400 text-xs tabular-nums">
@@ -547,7 +547,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="relative w-full max-w-md bg-surface-900 border-l border-surface-700 shadow-2xl flex flex-col h-full overflow-hidden">
+      <div className="relative w-full max-w-md bg-surface-900 border-s border-surface-700 shadow-2xl flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-surface-700 shrink-0">
           <div>
@@ -650,7 +650,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
                         <span className="text-slate-500 text-xs truncate">{tx.notes}</span>
                       )}
                     </div>
-                    <div className="text-right shrink-0 ml-2">
+                    <div className="text-end shrink-0 ms-2">
                       <span className={`font-medium tabular-nums ${tx.quantity_delta > 0 ? "text-emerald-400" : "text-red-400"}`}>
                         {tx.quantity_delta > 0 ? "+" : ""}{tx.quantity_delta}
                       </span>
@@ -791,12 +791,12 @@ export function InventoryPage() {
       {/* Filters */}
       <div className="flex gap-3 items-center flex-wrap">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             placeholder="Search SKU or name..."
-            className="w-full pl-9 pr-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
           />
         </div>
         <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -816,13 +816,13 @@ export function InventoryPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("inventory.sku")}</th>
-                <th className="px-4 py-3 text-left">{t("inventory.name")}</th>
-                <th className="px-4 py-3 text-right">{t("inventory.quantity")}</th>
-                <th className="px-4 py-3 text-right">{t("inventory.reserved")}</th>
-                <th className="px-4 py-3 text-right">{t("inventory.available")}</th>
-                <th className="px-4 py-3 text-left">{t("inventory.warehouse")}</th>
-                <th className="px-4 py-3 text-right">{t("common.actions")}</th>
+                <th className="px-4 py-3 text-start">{t("inventory.sku")}</th>
+                <th className="px-4 py-3 text-start">{t("inventory.name")}</th>
+                <th className="px-4 py-3 text-end">{t("inventory.quantity")}</th>
+                <th className="px-4 py-3 text-end">{t("inventory.reserved")}</th>
+                <th className="px-4 py-3 text-end">{t("inventory.available")}</th>
+                <th className="px-4 py-3 text-start">{t("inventory.warehouse")}</th>
+                <th className="px-4 py-3 text-end">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -851,7 +851,7 @@ export function InventoryPage() {
                   >
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{item.sku}</td>
                     <td className="px-4 py-3 text-white font-medium">{item.name}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <StockBadge
                         quantity={item.quantity}
                         lowThreshold={item.low_stock_threshold}
@@ -859,16 +859,16 @@ export function InventoryPage() {
                         unit={item.unit}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
                       {item.reserved_quantity}
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-300 tabular-nums font-medium">
+                    <td className="px-4 py-3 text-end text-slate-300 tabular-nums font-medium">
                       {item.available_quantity}
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs font-mono">
                       {item.warehouse_id?.slice(0, 8)}…
                     </td>
-                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-3 text-end" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setIssueTarget(item)}

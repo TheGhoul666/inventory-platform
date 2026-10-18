@@ -61,12 +61,12 @@ export function AuditLogsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("audit.timestamp")}</th>
-                <th className="px-4 py-3 text-left">{t("audit.user")}</th>
-                <th className="px-4 py-3 text-left">{t("audit.action")}</th>
-                <th className="px-4 py-3 text-left">{t("audit.resource")}</th>
-                <th className="px-4 py-3 text-left">Resource ID</th>
-                <th className="px-4 py-3 text-left">{t("transactions.notes")}</th>
+                <th className="px-4 py-3 text-start">{t("audit.timestamp")}</th>
+                <th className="px-4 py-3 text-start">{t("audit.user")}</th>
+                <th className="px-4 py-3 text-start">{t("audit.action")}</th>
+                <th className="px-4 py-3 text-start">{t("audit.resource")}</th>
+                <th className="px-4 py-3 text-start">Resource ID</th>
+                <th className="px-4 py-3 text-start">{t("transactions.notes")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">

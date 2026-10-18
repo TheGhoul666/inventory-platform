@@ -93,6 +93,7 @@ export type AlertSeverity = "INFO" | "WARNING" | "CRITICAL" | "EMERGENCY";
 export type AlertStatus = "OPEN" | "ACKNOWLEDGED" | "RESOLVED" | "ESCALATED";
 
 export interface DashboardSummary {
+  total_items_count: number;
   low_stock_count: number;
   critical_stock_count: number;
   critical_items: Array<{
@@ -105,11 +106,21 @@ export interface DashboardSummary {
   generated_at: string;
 }
 
+export interface EmaPoint {
+  date: string;
+  ema: number;
+}
+
 export interface UsageAnalytics {
   item_id: string;
   daily_consumption_rate: number;
-  predicted_depletion_days: number | null;
   period_days: number;
+}
+
+export interface DepletionForecast {
+  item_id: string;
+  predicted_days_left: number | null;
+  ema_trend: EmaPoint[];
 }
 
 export interface AnomalyResult {

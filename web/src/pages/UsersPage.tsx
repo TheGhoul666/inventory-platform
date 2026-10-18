@@ -214,7 +214,7 @@ function EditPermissionsModal({
           ניתן להוסיף / להסיר הרשאות נוספות מעבר לתפקיד.
         </p>
 
-        <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto mb-5 pr-1">
+        <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto mb-5 pe-1">
           {allPermissions.map((p) => {
             const fromRole = rolePerms.includes(p);
             const checked = fromRole || extraSet.has(p);
@@ -223,7 +223,7 @@ function EditPermissionsModal({
                 key={p}
                 onClick={() => toggle(p)}
                 disabled={fromRole}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-left transition-colors ${
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-start transition-colors ${
                   fromRole
                     ? "bg-brand-900/40 text-brand-300 cursor-default"
                     : checked
@@ -406,13 +406,13 @@ export function UsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("users.email")}</th>
-                <th className="px-4 py-3 text-left">{t("users.fullName")}</th>
-                <th className="px-4 py-3 text-left">{t("users.username")}</th>
-                <th className="px-4 py-3 text-left">Phone</th>
-                <th className="px-4 py-3 text-left">{t("users.role")}</th>
-                <th className="px-4 py-3 text-left">{t("users.created")}</th>
-                <th className="px-4 py-3 text-right">{t("users.actions")}</th>
+                <th className="px-4 py-3 text-start">{t("users.email")}</th>
+                <th className="px-4 py-3 text-start">{t("users.fullName")}</th>
+                <th className="px-4 py-3 text-start">{t("users.username")}</th>
+                <th className="px-4 py-3 text-start">Phone</th>
+                <th className="px-4 py-3 text-start">{t("users.role")}</th>
+                <th className="px-4 py-3 text-start">{t("users.created")}</th>
+                <th className="px-4 py-3 text-end">{t("users.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -466,7 +466,7 @@ export function UsersPage() {
                       <td className="px-4 py-3 text-slate-500 text-xs">
                         {user.created_at ? new Date(user.created_at).toLocaleDateString() : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-end">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => setEditPhoneUser(user)}

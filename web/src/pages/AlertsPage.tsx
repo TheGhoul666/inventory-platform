@@ -102,7 +102,7 @@ export function AlertsPage() {
                   <p className="text-slate-600 text-xs mt-2">
                     {new Date(alert.created_at).toLocaleString()}
                     {alert.acknowledged_at && (
-                      <span className="ml-3">
+                      <span className="ms-3">
                         Acknowledged: {new Date(alert.acknowledged_at).toLocaleString()}
                       </span>
                     )}

@@ -4,7 +4,17 @@
  */
 import api from "./api";
 import { supabase } from "@/lib/supabase";
+import {
+  averageRate,
+  dailyConsumption,
+  detectAnomaly,
+  emaSeries,
+  predictedDaysLeft,
+} from "@/utils/analytics";
 import type {
+  AnomalyResult,
+  DepletionForecast,
+  UsageAnalytics,
   InventoryItem,
   PaginatedResponse,
   Transaction,
@@ -115,6 +125,18 @@ export const inventoryService = {
   },
 };
 
+async function loadConsumption(item_id: string, days: number) {
+  const since = new Date(Date.now() - days * 86_400_000).toISOString();
+  const { data, error } = await supabase.from("inventory_transactions")
+    .select("transaction_type, quantity_delta, created_at")
+    .eq("item_id", item_id)
+    .eq("is_deleted", false)
+    .gte("created_at", since)
+    .limit(1000);
+  if (error) throw error;
+  return dailyConsumption(data ?? [], days);
+}
+
 export const analyticsService = {
   getDashboardSummary: async () => {
     const { data: items, error } = await supabase.from("inventory_items")
@@ -135,18 +157,22 @@ export const analyticsService = {
     };
   },
 
-  getItemUsage: async (item_id: string, _days = 30) => {
-    const { data } = await supabase.from("inventory_transactions")
-      .select("*")
-      .eq("item_id", item_id)
-      .eq("is_deleted", false)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    return { usage: data ?? [] };
+  getItemUsage: async (item_id: string, days = 30): Promise<UsageAnalytics> => {
+    const series = await loadConsumption(item_id, days);
+    return { item_id, period_days: days, daily_consumption_rate: averageRate(series) };
   },
 
-  getPredictedDepletion: async (_item_id: string) => ({ prediction: null }),
-  getAnomalies: async (_item_id: string) => ({ anomalies: [] }),
+  getPredictedDepletion: async (item_id: string, quantity: number, days = 30): Promise<DepletionForecast> => {
+    const series = await loadConsumption(item_id, days);
+    return {
+      item_id,
+      predicted_days_left: predictedDaysLeft(quantity, averageRate(series)),
+      ema_trend: emaSeries(series),
+    };
+  },
+
+  getAnomalies: async (item_id: string, days = 30): Promise<AnomalyResult> =>
+    detectAnomaly(await loadConsumption(item_id, days), item_id),
 };
 
 export const alertService = {

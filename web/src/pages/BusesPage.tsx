@@ -105,7 +105,7 @@ function CreateBusModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal title="Add Bus to Fleet" onClose={onClose}>
-      <div className="space-y-3 max-h-[65vh] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[65vh] overflow-y-auto pe-1">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Fleet Number *">
             <input value={form.fleet_number} onChange={set("fleet_number")} placeholder="BUS-001" className={inputCls} />
@@ -214,13 +214,13 @@ export function BusesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("buses.fleetNumber")}</th>
-                <th className="px-4 py-3 text-left">{t("buses.model")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.fleetNumber")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.model")}</th>
                 <th className="px-4 py-3 text-center">{t("buses.year")}</th>
-                <th className="px-4 py-3 text-left">{t("buses.plateNumber")}</th>
-                <th className="px-4 py-3 text-right">{t("buses.mileage")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.plateNumber")}</th>
+                <th className="px-4 py-3 text-end">{t("buses.mileage")}</th>
                 <th className="px-4 py-3 text-center">{t("buses.status")}</th>
-                <th className="px-4 py-3 text-right">{t("common.actions")}</th>
+                <th className="px-4 py-3 text-end">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -250,7 +250,7 @@ export function BusesPage() {
                     </td>
                     <td className="px-4 py-3 text-center text-slate-400">{bus.year}</td>
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{bus.license_plate}</td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
                       {bus.mileage_km.toLocaleString()} km
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -258,7 +258,7 @@ export function BusesPage() {
                         {STATUS_LABELS[bus.status] ?? bus.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {(bus.status === "ACTIVE" || bus.status === "MAINTENANCE") && (
                         <button
                           onClick={() => {

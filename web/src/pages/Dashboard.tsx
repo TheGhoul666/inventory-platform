@@ -73,7 +73,7 @@ export function Dashboard() {
   if (summaryLoading) {
     return (
       <div className="flex items-center justify-center h-64 text-slate-400">
-        <RefreshCw className="h-8 w-8 animate-spin mr-3" />
+        <RefreshCw className="h-8 w-8 animate-spin me-3" />
         {t("dashboard.loading")}
       </div>
     );
@@ -110,14 +110,14 @@ export function Dashboard() {
           title={t("dashboard.criticalStock")}
           value={summary?.critical_stock_count ?? 0}
           icon={AlertTriangle}
-          color={summary?.critical_stock_count > 0 ? "text-red-400" : "text-emerald-400"}
+          color={(summary?.critical_stock_count ?? 0) > 0 ? "text-red-400" : "text-emerald-400"}
           subtitle={t("dashboard.criticalSubtitle")}
         />
         <StatCard
           title={t("dashboard.lowStock")}
           value={summary?.low_stock_count ?? 0}
           icon={TrendingDown}
-          color={summary?.low_stock_count > 0 ? "text-amber-400" : "text-emerald-400"}
+          color={(summary?.low_stock_count ?? 0) > 0 ? "text-amber-400" : "text-emerald-400"}
           subtitle={t("dashboard.lowSubtitle")}
         />
         <StatCard

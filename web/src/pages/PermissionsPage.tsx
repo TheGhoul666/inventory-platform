@@ -96,12 +96,12 @@ function CreateRoleModal({
 
         <div className="mb-5">
           <p className="text-sm text-slate-400 mb-2">הרשאות</p>
-          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1">
+          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pe-1">
             {allPermissions.map((p) => (
               <button
                 key={p}
                 onClick={() => toggle(p)}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors text-left ${
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors text-start ${
                   selected.has(p)
                     ? "bg-brand-600 text-white"
                     : "bg-surface-700 text-slate-400 hover:text-white"
@@ -208,7 +208,7 @@ function PermissionMatrix({
       <table className="w-full text-xs border-collapse">
         <thead>
           <tr>
-            <th className="px-3 py-2 text-left text-slate-400 font-medium border-b border-surface-700 bg-surface-800 sticky left-0 z-10 min-w-40">
+            <th className="px-3 py-2 text-start text-slate-400 font-medium border-b border-surface-700 bg-surface-800 sticky start-0 z-10 min-w-40">
               הרשאה
             </th>
             {roles.map((r) => (
@@ -224,7 +224,7 @@ function PermissionMatrix({
         <tbody className="divide-y divide-surface-700/50">
           {allPermissions.map((p) => (
             <tr key={p} className="hover:bg-surface-700/30">
-              <td className="px-3 py-2 text-slate-300 font-mono bg-surface-800 sticky left-0 border-r border-surface-700">
+              <td className="px-3 py-2 text-slate-300 font-mono bg-surface-800 sticky start-0 border-e border-surface-700">
                 {PERMISSION_LABELS[p] ?? p}
                 <span className="block text-slate-600 text-[10px]">{p}</span>
               </td>

@@ -173,7 +173,21 @@
     "days30": "30 days",
     "days90": "90 days",
     "loading": "Loading analytics…",
-    "noData": "No analytics data available"
+    "noData": "No analytics data available",
+    "selectItem": "Select item to analyze",
+    "searchPlaceholder": "Search by SKU or name…",
+    "dailyRate": "Daily Consumption Rate",
+    "perDayAvg": "{{unit}}/day (30d avg)",
+    "predictedDepletion": "Predicted Depletion",
+    "atCurrentRate": "At current consumption rate",
+    "daysUnit": "{{n}} days",
+    "anomaly": "Usage Anomaly",
+    "spike": "SPIKE",
+    "normal": "Normal",
+    "ratio": "7d/30d ratio: {{ratio}}x",
+    "emaTitle": "Exponential Moving Average — 7-Day Consumption Trend",
+    "emaSeries": "EMA (units/day)",
+    "notEnough": "Not enough transaction history to plot a trend for this item."
   },
   "buses": {
     "title": "Buses",

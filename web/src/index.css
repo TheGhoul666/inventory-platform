@@ -8,12 +8,28 @@
   }
 
   html {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: "Inter", "Heebo", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
     @apply bg-surface-900 text-white;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-surface-900;
+  }
+
+  ::selection {
+    @apply bg-brand-600/40;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* Custom scrollbar for dark theme */
