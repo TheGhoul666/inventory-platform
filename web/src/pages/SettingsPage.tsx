@@ -37,7 +37,7 @@ export function SettingsPage() {
       </div>
 
       {/* Profile card */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{t("settings.profile")}</h2>
         </div>
@@ -61,7 +61,7 @@ export function SettingsPage() {
       </div>
 
       {/* Notification phone */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
             <Phone className="h-4 w-4" /> Alert Notifications
@@ -83,7 +83,7 @@ export function SettingsPage() {
             <button
               onClick={() => phoneMutation.mutate()}
               disabled={phoneMutation.isPending}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-2 btn-primary text-sm font-medium transition-colors"
             >
               {phoneMutation.isPending ? "Saving…" : "Save"}
             </button>
@@ -92,7 +92,7 @@ export function SettingsPage() {
       </div>
 
       {/* Roles & Permissions */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Access</h2>
         </div>
@@ -139,7 +139,7 @@ export function SettingsPage() {
       </div>
 
       {/* Sign out */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="p-6">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Session</h2>
           <button

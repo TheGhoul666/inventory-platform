@@ -73,11 +73,11 @@ export function AlertsPage() {
       <div className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-surface-800 rounded-xl border border-surface-700 p-4 animate-pulse h-24" />
+              <div key={i} className="card p-4 animate-pulse h-24" />
             ))
           : alerts.length === 0
           ? (
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-12 text-center">
+            <div className="card p-12 text-center">
               <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-3" />
               <p className="text-slate-300 font-medium">{t("alerts.noAlerts")}</p>
               <p className="text-slate-500 text-sm mt-1">{t("alerts.allClear")}</p>
@@ -86,7 +86,7 @@ export function AlertsPage() {
           : alerts.map((alert) => (
             <div
               key={alert.id}
-              className="bg-surface-800 rounded-xl border border-surface-700 p-4 hover:border-surface-600 transition-colors"
+              className="card p-4 hover:border-surface-600 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">

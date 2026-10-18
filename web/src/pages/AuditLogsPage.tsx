@@ -56,7 +56,7 @@ export function AuditLogsPage() {
         </div>
       </div>
 
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

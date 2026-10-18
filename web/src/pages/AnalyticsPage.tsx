@@ -62,7 +62,7 @@ export function AnalyticsPage() {
       </div>
 
       {/* Item selector */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-4">
+      <div className="card p-4">
         <label htmlFor="analytics-item" className="text-sm text-slate-400 block mb-2">{t("analytics.selectItem")}</label>
         <div className="relative">
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
@@ -101,7 +101,7 @@ export function AnalyticsPage() {
         <>
           {/* Key metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-6">
+            <div className="card p-6">
               <p className="text-slate-400 text-sm">{t("analytics.dailyRate")}</p>
               <p className="text-3xl font-bold text-white mt-1">
                 {usage?.daily_consumption_rate?.toFixed(2) ?? "—"}
@@ -109,7 +109,7 @@ export function AnalyticsPage() {
               <p className="text-slate-500 text-xs mt-1">{t("analytics.perDayAvg", { unit: selectedItem.unit })}</p>
             </div>
 
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-6">
+            <div className="card p-6">
               <p className="text-slate-400 text-sm">{t("analytics.predictedDepletion")}</p>
               <p
                 className={`text-3xl font-bold mt-1 ${
@@ -125,7 +125,7 @@ export function AnalyticsPage() {
               <p className="text-slate-500 text-xs mt-1">{t("analytics.atCurrentRate")}</p>
             </div>
 
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-6">
+            <div className="card p-6">
               <p className="text-slate-400 text-sm">{t("analytics.anomaly")}</p>
               {anomaly ? (
                 <>
@@ -142,7 +142,7 @@ export function AnalyticsPage() {
 
           {/* EMA chart */}
           {emaData.length > 0 && (
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-6">
+            <div className="card p-6">
               <h2 className="font-semibold text-white mb-4">
                 {t("analytics.emaTitle")}
               </h2>
@@ -180,7 +180,7 @@ export function AnalyticsPage() {
           )}
 
           {emaData.length === 0 && usage && (
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-8 text-center">
+            <div className="card p-8 text-center">
               <p className="text-slate-500 text-sm">
                 {t("analytics.notEnough")}
               </p>

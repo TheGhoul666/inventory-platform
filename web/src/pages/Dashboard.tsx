@@ -41,7 +41,7 @@ function StatCard({
   subtitle?: string;
 }) {
   return (
-    <div className="bg-surface-800 rounded-xl border border-surface-700 p-6">
+    <div className="card p-6">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-slate-400 text-sm font-medium">{title}</p>
@@ -97,7 +97,7 @@ export function Dashboard() {
         </div>
         <button
           onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 bg-surface-700 hover:bg-surface-600 rounded-lg text-sm text-slate-300 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-secondary text-sm"
         >
           <RefreshCw className="h-4 w-4" />
           {t("dashboard.refresh")}
@@ -139,7 +139,7 @@ export function Dashboard() {
       {/* Critical items + open alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Critical stock table */}
-        <div className="bg-surface-800 rounded-xl border border-surface-700">
+        <div className="card">
           <div className="p-4 border-b border-surface-700">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-400" />
@@ -168,7 +168,7 @@ export function Dashboard() {
         </div>
 
         {/* Open alerts */}
-        <div className="bg-surface-800 rounded-xl border border-surface-700">
+        <div className="card">
           <div className="p-4 border-b border-surface-700">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <Activity className="h-4 w-4 text-amber-400" />

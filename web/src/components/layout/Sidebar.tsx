@@ -52,8 +52,8 @@ export function Sidebar() {
       <div className="flex items-center justify-between h-16 px-4 border-b border-surface-700">
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
-            <Bus className="h-6 w-6 text-brand-500" />
-            <span className="font-bold text-white text-sm">{t("nav.appName")}</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-900/50"><Bus className="h-4 w-4 text-white" /></span>
+            <span className="font-semibold tracking-tight text-white text-sm">{t("nav.appName")}</span>
           </div>
         )}
         <button
@@ -76,7 +76,7 @@ export function Sidebar() {
             title={sidebarCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group",
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors group",
                 isActive
                   ? "bg-brand-600 text-white shadow-md shadow-brand-900/40"
                   : "text-slate-400 hover:text-white hover:bg-surface-700"

@@ -65,7 +65,7 @@ function CreateRoleModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-lg shadow-2xl">
+      <div className="card p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">יצירת תפקיד מותאם</h3>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
@@ -128,7 +128,7 @@ function CreateRoleModal({
           <button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending || !valid}
-            className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+            className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
           >
             {mutation.isPending ? "יוצר…" : "צור תפקיד"}
           </button>
@@ -271,7 +271,7 @@ export function PermissionsPage() {
   });
 
   const handleDelete = (name: string) => {
-    if (window.confirm(`למחוק את התפקיד "${name}"?`)) {
+    if (window.confirm(t("permissions.deleteConfirm", { name }))) {
       deleteMutation.mutate(name);
     }
   };
@@ -293,7 +293,7 @@ export function PermissionsPage() {
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("permissions.createRole")}
@@ -330,7 +330,7 @@ export function PermissionsPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+        <div className="card overflow-hidden">
           <PermissionMatrix roles={roles} allPermissions={allPermissions} />
         </div>
       )}
