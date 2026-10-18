@@ -7,3 +7,6 @@ explicit_package_bases = true
 namespace_packages = true
 mypy_path = "."
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
