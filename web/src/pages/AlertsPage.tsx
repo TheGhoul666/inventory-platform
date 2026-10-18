@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bell, CheckCircle, XCircle, Filter } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { alertService } from "@/services/inventoryService";
 import { AlertBadge } from "@/components/ui/AlertBadge";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { FilterChips } from "@/components/ui/FilterChips";
 import { fmtDateTime } from "@/utils/format";
 import type { Alert, AlertSeverity, AlertStatus } from "@/types";
 
@@ -46,30 +48,25 @@ export function AlertsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
-            <Bell className="h-6 w-6 text-amber-400" />
-            {t("alerts.title")}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">{alerts.length} {t("alerts.title").toLowerCase()}</p>
-        </div>
-        <div className="flex gap-2">
-          {(["", "OPEN", "ACKNOWLEDGED", "RESOLVED"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                statusFilter === s
-                  ? "bg-brand-600 text-white"
-                  : "bg-surface-700 text-slate-400 hover:text-ink"
-              }`}
-            >
-              {s || "All"}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        title={<>{t("alerts.title")}</>}
+        subtitle={<>{alerts.length} {t("alerts.title").toLowerCase()}</>}
+        actions={
+          <>
+        <FilterChips
+          label={t("common.status")}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          options={[
+            { value: "", label: t("common.all") },
+            { value: "OPEN", label: t("alerts.open") },
+            { value: "ACKNOWLEDGED", label: t("alerts.acknowledged") },
+            { value: "RESOLVED", label: t("alerts.resolved") },
+          ]}
+        />
+          </>
+        }
+      />
 
       <div className="space-y-3">
         {isLoading

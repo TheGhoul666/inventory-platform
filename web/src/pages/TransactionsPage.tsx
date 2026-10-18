@@ -4,6 +4,7 @@ import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, RotateCcw } from "lucid
 import { inventoryService } from "@/services/inventoryService";
 import { fmtDateTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const TYPE_CONFIG: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
   ISSUE: { label: "Issue", cls: "bg-red-500/15 text-red-400", Icon: ArrowDownCircle },
@@ -41,11 +42,11 @@ export function TransactionsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{t("transactions.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{filtered.length} {t("transactions.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("transactions.title")}</>}
+        subtitle={<>{filtered.length} {t("transactions.title").toLowerCase()}</>}
+        actions={
+          <>
         <select
           aria-label={t("transactions.type")}
           value={typeFilter}
@@ -57,11 +58,13 @@ export function TransactionsPage() {
           <option value="RESTOCK">{t("transactions.restock")}</option>
           <option value="TRANSFER">{t("transactions.transfer")}</option>
         </select>
-      </div>
+          </>
+        }
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-start">Type</th>

@@ -1,41 +1,18 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Plus, Warehouse, X, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Warehouse, ToggleLeft, ToggleRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Field } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
 import { useDialog } from "@/hooks/useDialog";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
-
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  const dialog = useDialog(onClose);
-  return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
-      <div className="card p-6 w-full max-w-md ">
-        <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
-          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
 
 const inputCls =
   "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
@@ -181,11 +158,11 @@ export function WarehousesPage() {
     <div className="space-y-4">
       {showCreate && <CreateWarehouseModal onClose={() => setShowCreate(false)} />}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{t("warehouses.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{warehouses.length} {t("warehouses.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("warehouses.title")}</>}
+        subtitle={<>{warehouses.length} {t("warehouses.title").toLowerCase()}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
@@ -193,11 +170,13 @@ export function WarehousesPage() {
           <Plus className="h-4 w-4" />
           {t("warehouses.addWarehouse")}
         </button>
-      </div>
+          </>
+        }
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-start">{t("warehouses.code")}</th>

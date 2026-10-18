@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, Plus, Trash2, X, Check, Lock } from "lucide-react";
+import { Plus, Trash2, X, Check, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { rolesService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Field } from "@/components/ui/Field";
 import { useDialog } from "@/hooks/useDialog";
 
@@ -284,14 +285,11 @@ export function PermissionsPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-brand-500" />
-            {t("permissions.title")}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">{t("permissions.subtitle")}</p>
-        </div>
+      <PageHeader
+        title={<>{t("permissions.title")}</>}
+        subtitle={<>{t("permissions.subtitle")}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
@@ -299,7 +297,9 @@ export function PermissionsPage() {
           <Plus className="h-4 w-4" />
           {t("permissions.createRole")}
         </button>
-      </div>
+          </>
+        }
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 bg-surface-800 p-1 rounded-lg w-fit border border-surface-700">

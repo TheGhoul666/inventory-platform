@@ -38,7 +38,8 @@
     "creating": "Creating…",
     "saving": "Saving…",
     "deleting": "Deleting…",
-    "retry": "Try again"
+    "retry": "Try again",
+    "processing": "Working…"
   },
   "auth": {
     "signIn": "Sign in",

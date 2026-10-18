@@ -4,6 +4,7 @@ import { ShieldCheck } from "lucide-react";
 import { auditService } from "@/services/inventoryService";
 import { fmtDateTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export function AuditLogsPage() {
   const { t } = useTranslation();
@@ -28,11 +29,11 @@ export function AuditLogsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{t("audit.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">Immutable record of all system actions</p>
-        </div>
+      <PageHeader
+        title={<>{t("audit.title")}</>}
+        subtitle={<>Immutable record of all system actions</>}
+        actions={
+          <>
         <div className="flex gap-2">
           <input
             value={resourceType}
@@ -49,11 +50,13 @@ export function AuditLogsPage() {
             className="bg-white border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
           />
         </div>
-      </div>
+          </>
+        }
+      />
 
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-start">{t("audit.timestamp")}</th>

@@ -12,6 +12,7 @@ import {
 import { BarChart3, Search } from "lucide-react";
 import { analyticsService, inventoryService } from "@/services/inventoryService";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { InventoryItem } from "@/types";
 
 export function AnalyticsPage() {
@@ -51,15 +52,7 @@ export function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
-          <BarChart3 className="h-6 w-6 text-brand-400" />
-          {t("analytics.title")}
-        </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          {t("analytics.consumption")}
-        </p>
-      </div>
+      <PageHeader title={t("analytics.title")} subtitle={t("analytics.consumption")} />
 
       {/* Item selector */}
       <div className="card p-4">
@@ -73,7 +66,7 @@ export function AnalyticsPage() {
             onChange={(e) => { setSearch(e.target.value); setShowDropdown(true); setSelectedItem(null); }}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             placeholder={t("analytics.searchPlaceholder")}
-            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-lg text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-full text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
           {showDropdown && items.length > 0 && (
             <div className="absolute top-full start-0 end-0 mt-1 bg-white border border-surface-600 rounded-lg shadow-xl z-20 overflow-hidden">

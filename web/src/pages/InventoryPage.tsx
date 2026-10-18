@@ -20,69 +20,14 @@ import { inventoryService, warehouseService, busService } from "@/services/inven
 import { extractError as getError } from "@/services/api";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Field } from "@/components/ui/Field";
+import { Modal, ModalActions } from "@/components/ui/Modal";
 import { useDialog } from "@/hooks/useDialog";
 import { fmtDate } from "@/utils/format";
 import type { InventoryItem, Transaction } from "@/types";
 
 // ── Shared modal shell ──────────────────────────────────────────────────────
-
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: React.ReactNode;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  const dialog = useDialog(onClose);
-  return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
-      <div className="card p-6 w-full max-w-md ">
-        <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
-          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ModalActions({
-  onClose,
-  onConfirm,
-  pending,
-  label,
-  confirmClass = "bg-brand-600 hover:bg-brand-700 text-white",
-}: {
-  onClose: () => void;
-  onConfirm: () => void;
-  pending: boolean;
-  label: string;
-  confirmClass?: string;
-}) {
-  return (
-    <div className="flex gap-3 mt-6">
-      <button
-        onClick={onClose}
-        className="flex-1 px-4 py-2 bg-surface-700 hover:bg-surface-600 text-slate-300 rounded-lg text-sm transition-colors"
-      >
-        Cancel
-      </button>
-      <button
-        onClick={onConfirm}
-        disabled={pending || confirmClass.includes("cursor-not-allowed")}
-        className={`flex-1 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors ${confirmClass}`}
-      >
-        {pending ? "Processing..." : label}
-      </button>
-    </div>
-  );
-}
 
 // ── Field helper ────────────────────────────────────────────────────────────
 
@@ -158,7 +103,7 @@ function IssueModal({ item, onClose }: { item: InventoryItem; onClose: () => voi
         onConfirm={() => mutation.mutate()}
         pending={mutation.isPending}
         label="Issue"
-        confirmClass="bg-red-600 hover:bg-red-700 text-white"
+        confirmClass="bg-red-700 hover:bg-red-800 text-white"
       />
     </Modal>
   );
@@ -223,7 +168,7 @@ function RestockModal({ item, onClose }: { item: InventoryItem; onClose: () => v
         onConfirm={() => mutation.mutate()}
         pending={mutation.isPending}
         label="Restock"
-        confirmClass="bg-emerald-600 hover:bg-emerald-700 text-white"
+        confirmClass="bg-brand-600 hover:bg-brand-700 text-white"
       />
     </Modal>
   );
@@ -341,7 +286,7 @@ function AddItemModal({ onClose }: { onClose: () => void }) {
         onConfirm={() => mutation.mutate()}
         pending={mutation.isPending}
         label="Create Item"
-        confirmClass={`text-white ${valid ? "bg-brand-600 hover:bg-brand-700" : "bg-brand-600 opacity-50 cursor-not-allowed"}`}
+        confirmClass={`text-white ${valid ? "btn-primary" : "btn-primary opacity-50 cursor-not-allowed"}`}
       />
     </Modal>
   );
@@ -764,11 +709,11 @@ export function InventoryPage() {
       {detailItem && <ItemDetailDrawer item={detailItem} onClose={() => setDetailItem(null)} />}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">{t("inventory.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{total} {t("inventory.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("inventory.title")}</>}
+        subtitle={<>{total} {t("inventory.title").toLowerCase()}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowAddItem(true)}
           className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
@@ -776,7 +721,9 @@ export function InventoryPage() {
           <Plus className="h-4 w-4" />
           {t("inventory.addItem")}
         </button>
-      </div>
+          </>
+        }
+      />
 
       {/* Filters */}
       <div className="flex gap-3 items-center flex-wrap">
@@ -787,7 +734,7 @@ export function InventoryPage() {
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             aria-label={t("common.search")}
             placeholder="Search SKU or name..."
-            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-lg text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-full text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
         </div>
         <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -804,7 +751,7 @@ export function InventoryPage() {
       {/* Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-start">{t("inventory.sku")}</th>

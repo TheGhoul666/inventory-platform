@@ -6,6 +6,7 @@ import { usersService } from "@/services/inventoryService";
 import { extractError } from "@/services/api";
 import { Shield, User, Mail, Key, LogOut, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const ROLE_COLORS: Record<string, string> = {
   SuperAdmin: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
@@ -31,10 +32,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <h1 className="text-2xl font-bold text-ink">{t("settings.title")}</h1>
-        <p className="text-slate-400 text-sm mt-1">Your account and session information</p>
-      </div>
+      <PageHeader title={t("settings.title")} subtitle="Your account and session information" />
 
       {/* Profile card */}
       <div className="card overflow-hidden">

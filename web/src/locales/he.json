@@ -38,7 +38,8 @@
     "creating": "יוצר…",
     "saving": "שומר…",
     "deleting": "מוחק…",
-    "retry": "נסו שוב"
+    "retry": "נסו שוב",
+    "processing": "מעבד…"
   },
   "auth": {
     "signIn": "התחברות",
