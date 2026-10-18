@@ -112,3 +112,87 @@ export function sortByUrgency(levels: StockLevel[]): StockLevel[] {
   const urgency = (l: StockLevel) => l.quantity / Math.max(l.low, 1);
   return [...levels].sort((a, b) => urgency(a) - urgency(b));
 }
+
+// ── Dashboard trends ────────────────────────────────────────────────────────
+
+export interface TxnQty extends TxnLike {
+  quantity_before?: number | string | null;
+  quantity_after?: number | string | null;
+}
+
+const ADDING = new Set(["RESTOCK", "RELEASE", "RETURN"]);
+
+/** Signed effect of a transaction on the item's quantity. */
+export function netChange(t: TxnQty): number {
+  if (t.quantity_before != null && t.quantity_after != null) {
+    return Number(t.quantity_after) - Number(t.quantity_before);
+  }
+  const type = t.transaction_type ?? t.type ?? "";
+  const size = Math.abs(Number(t.quantity_delta));
+  if (ADDING.has(type)) return size;
+  if (CONSUMING.has(type)) return -size;
+  return 0;
+}
+
+export interface HealthItem {
+  id: string;
+  quantity: number | string;
+  low_stock_threshold: number | string;
+  critical_stock_threshold: number | string;
+  unit_cost?: number | string | null;
+}
+
+export interface HealthTrend {
+  dates: string[];
+  critical: number[];
+  low: number[];
+  ok: number[];
+  value: number[];
+}
+
+const dateList = (days: number, now: Date) =>
+  Array.from({ length: days }, (_, i) => new Date(now.getTime() - (days - 1 - i) * DAY_MS).toISOString().slice(0, 10));
+
+/**
+ * Per-day stock health, rebuilt by walking back from today's quantities through the
+ * transactions of the period (quantity at end of day d = now − changes made after d).
+ */
+export function dailyHealthSeries(items: HealthItem[], txns: (TxnQty & { item_id?: string })[], days: number, now = new Date()): HealthTrend {
+  const dates = dateList(days, now);
+  const byItem = new Map<string, TxnQty[]>();
+  for (const t of txns) {
+    if (!t.item_id) continue;
+    const list = byItem.get(t.item_id) ?? [];
+    list.push(t);
+    byItem.set(t.item_id, list);
+  }
+  const trend: HealthTrend = { dates, critical: dates.map(() => 0), low: dates.map(() => 0), ok: dates.map(() => 0), value: dates.map(() => 0) };
+  for (const item of items) {
+    const current = Number(item.quantity);
+    const low = Number(item.low_stock_threshold);
+    const crit = Number(item.critical_stock_threshold);
+    const cost = Number(item.unit_cost ?? 0) || 0;
+    const own = byItem.get(item.id) ?? [];
+    dates.forEach((d, i) => {
+      const after = own.reduce((sum, t) => (dayKey(t.created_at) > d ? sum + netChange(t) : sum), 0);
+      const qty = Math.max(current - after, 0);
+      if (qty <= crit) trend.critical[i] += 1;
+      else if (qty <= low) trend.low[i] += 1;
+      else trend.ok[i] += 1;
+      trend.value[i] += qty * cost;
+    });
+  }
+  return trend;
+}
+
+/** Change between the last two points of a series (today vs yesterday). */
+export function lastDelta(series: number[]): number {
+  return series.length >= 2 ? series[series.length - 1] - series[series.length - 2] : 0;
+}
+
+/** Consumption of the last 7 days relative to the 7 before; null when there is no earlier usage. */
+export function weekOverWeek(series: { qty: number }[]): number | null {
+  const last = series.slice(-7).reduce((s, p) => s + p.qty, 0);
+  const prev = series.slice(-14, -7).reduce((s, p) => s + p.qty, 0);
+  return prev > 0 ? Math.round((last / prev) * 10) / 10 : null;
+}

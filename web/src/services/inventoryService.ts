@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import {
   averageRate,
   consumptionRateByItem,
+  dailyHealthSeries,
   sortByUrgency,
   toStockLevel,
   dailyConsumption,
@@ -165,10 +166,10 @@ export const analyticsService = {
     const since = new Date(Date.now() - days * 86_400_000).toISOString();
     const [itemsRes, txRes, recentRes] = await Promise.all([
       supabase.from("inventory_items")
-        .select("id, name, sku, unit, quantity, low_stock_threshold, critical_stock_threshold")
+        .select("id, name, sku, unit, quantity, low_stock_threshold, critical_stock_threshold, unit_cost")
         .eq("is_deleted", false),
       supabase.from("inventory_transactions")
-        .select("item_id, transaction_type, quantity_delta, created_at")
+        .select("item_id, transaction_type, quantity_delta, quantity_before, quantity_after, created_at")
         .eq("is_deleted", false)
         .gte("created_at", since)
         .limit(2000),
@@ -179,16 +180,27 @@ export const analyticsService = {
         .limit(4),
     ]);
     if (itemsRes.error) throw itemsRes.error;
-    const rates = consumptionRateByItem(txRes.data ?? [], days);
-    const levels = (itemsRes.data ?? []).map((i) => toStockLevel(i, rates));
+    const items = itemsRes.data ?? [];
+    const txns = txRes.data ?? [];
+    const rates = consumptionRateByItem(txns, days);
+    const levels = sortByUrgency(items.map((i) => toStockLevel(i, rates)));
+    const trend = dailyHealthSeries(items, txns, days);
+    const top = levels[0];
+    const topSeries = top ? dailyConsumption(txns.filter((t) => t.item_id === top.id), days) : [];
     return {
-      levels: sortByUrgency(levels).slice(0, 5),
+      levels: levels.slice(0, 5),
       counts: {
         total: levels.length,
         critical: levels.filter((l) => l.status === "critical").length,
         low: levels.filter((l) => l.status === "low").length,
         ok: levels.filter((l) => l.status === "ok").length,
       },
+      trend,
+      stockValue: items.reduce((sum, i) => sum + Number(i.quantity) * (Number(i.unit_cost ?? 0) || 0), 0),
+      hasCost: items.some((i) => Number(i.unit_cost ?? 0) > 0),
+      topConsumption: top
+        ? { name: top.name, unit: top.unit, series: topSeries, anomaly: detectAnomaly(topSeries, top.id) }
+        : null,
       recent: (recentRes.data ?? []) as unknown as Array<{
         id: string; transaction_type: string; quantity_delta: number; created_at: string; item: { name: string; unit?: string } | null;
       }>,

@@ -39,6 +39,13 @@ export function AlertsPage() {
 
   const alerts: Alert[] = data?.alerts ?? [];
 
+  const rowTint: Record<string, string> = {
+    CRITICAL: "!bg-[#fdf0e8]",
+    EMERGENCY: "!bg-[#f3e9f8]",
+    WARNING: "!bg-[#fef7df]",
+    INFO: "!bg-[#eaf2e3]",
+  };
+
   const statusColors: Record<AlertStatus, string> = {
     OPEN: "text-amber-400",
     ACKNOWLEDGED: "text-blue-400",
@@ -84,7 +91,7 @@ export function AlertsPage() {
           : alerts.map((alert) => (
             <div
               key={alert.id}
-              className="card p-4 hover:border-surface-600 transition-colors"
+              className={`card p-4 transition-colors hover:border-surface-600 ${rowTint[alert.severity]}`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">

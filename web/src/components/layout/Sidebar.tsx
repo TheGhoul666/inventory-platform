@@ -18,6 +18,8 @@ import { cn } from "@/utils/cn";
 import { useUIStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { alertService } from "@/services/inventoryService";
 
 export function Sidebar() {
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
@@ -42,6 +44,12 @@ export function Sidebar() {
   );
 
   const { user, roles } = useAuthStore();
+  const { data: alertsData } = useQuery({
+    queryKey: ["alerts", "open"],
+    queryFn: () => alertService.listAlerts({ status: "OPEN", limit: 10 }),
+    refetchInterval: 30_000,
+  });
+  const openAlerts = alertsData?.alerts?.length ?? 0;
   const displayName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? "";
 
   return (
@@ -55,8 +63,8 @@ export function Sidebar() {
       <div className="flex h-16 items-center justify-between px-4">
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white" aria-hidden="true">
-              <Bus className="h-5 w-5" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-lg font-extrabold text-white" aria-hidden="true">
+              B
             </span>
             <span className="text-lg font-extrabold tracking-tight text-ink">{t("nav.appName")}</span>
           </div>
@@ -87,7 +95,15 @@ export function Sidebar() {
             }
           >
             <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-            {!sidebarCollapsed && <span>{label}</span>}
+            {!sidebarCollapsed && <span className="flex-1">{label}</span>}
+            {path === "/alerts" && openAlerts > 0 && (
+              <span
+                className="min-w-5 rounded-full bg-clay px-1.5 text-center text-xs font-bold text-white"
+                aria-label={`${openAlerts}`}
+              >
+                {openAlerts}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

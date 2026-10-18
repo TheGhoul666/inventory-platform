@@ -7,11 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { analyticsService, alertService } from "@/services/inventoryService";
 import { AlertBadge } from "@/components/ui/AlertBadge";
+import { StockBar } from "@/components/ui/StockBar";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/authStore";
-import { fmtDateTime } from "@/utils/format";
+import { fmtDateTime, fmtMoney, fmtWhen } from "@/utils/format";
 import { cn } from "@/utils/cn";
-import type { StockLevel } from "@/utils/analytics";
+import { lastDelta, weekOverWeek, type StockLevel } from "@/utils/analytics";
 import type { Alert } from "@/types";
 
 const STATUS_STYLE = {
@@ -25,11 +26,40 @@ function greetingKey(): "greetingMorning" | "greetingAfternoon" | "greetingEveni
   return h < 12 ? "greetingMorning" : h < 18 ? "greetingAfternoon" : "greetingEvening";
 }
 
-function KpiCard({ tone, title, value, sub }: { tone: string; title: string; value: number | string; sub: string }) {
+function Sparkline({ series }: { series: number[] }) {
+  const max = Math.max(...series);
+  const min = Math.min(...series);
+  const span = max - min || 1;
+  const pts = series
+    .map((v, i) => `${(i / Math.max(series.length - 1, 1)) * 84},${32 - ((v - min) / span) * 26 - (max === min ? 10 : 0)}`)
+    .join(" ");
   return (
-    <div className={cn("rounded-2xl p-5", tone)}>
+    <svg width="84" height="36" viewBox="0 0 84 36" aria-hidden="true" className="shrink-0">
+      <polyline points={pts} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function KpiCard({
+  tone,
+  title,
+  value,
+  sub,
+  series,
+}: {
+  tone: string;
+  title: string;
+  value: number | string;
+  sub: string;
+  series?: number[];
+}) {
+  return (
+    <div className={cn("overflow-hidden rounded-2xl p-5", tone)}>
       <p className="text-sm font-bold">{title}</p>
-      <p className="mt-1 text-5xl font-extrabold leading-none tabular-nums">{value}</p>
+      <div className="flex items-end justify-between gap-2">
+        <p className={cn("mt-1 min-w-0 font-extrabold leading-none tabular-nums", String(value).length > 4 ? "text-4xl" : "text-5xl")}>{value}</p>
+        {series && series.length > 1 && <Sparkline series={series} />}
+      </div>
       <p className="mt-2 text-sm">{sub}</p>
     </div>
   );
@@ -39,7 +69,6 @@ function StockRow({ level }: { level: StockLevel }) {
   const { t } = useTranslation();
   const st = STATUS_STYLE[level.status];
   const statusLabel = t(`dashboard.status${level.status === "ok" ? "Ok" : level.status === "low" ? "Low" : "Critical"}`);
-  const pct = Math.min(100, (level.quantity / level.scale) * 100);
   const forecast =
     level.daysLeft === null
       ? t("dashboard.noUsage")
@@ -58,15 +87,12 @@ function StockRow({ level }: { level: StockLevel }) {
           <span className={cn("text-lg font-extrabold tabular-nums", st.num)}>{level.quantity}</span>
         </div>
       </div>
-      <div
-        role="img"
-        aria-label={t("dashboard.levelAria", { qty: level.quantity, scale: Math.round(level.scale), status: statusLabel })}
-        className="relative h-3.5 rounded-full bg-surface-700"
-      >
-        <div className={cn("h-full rounded-full", st.bar)} style={{ width: `${pct}%` }} />
-        <span className="absolute -inset-y-[3px] w-0.5 bg-clay" style={{ insetInlineStart: `${(level.critical / level.scale) * 100}%` }} />
-        <span className="absolute -inset-y-[3px] w-0.5 bg-[#c79a14]" style={{ insetInlineStart: `${(level.low / level.scale) * 100}%` }} />
-      </div>
+      <StockBar
+        quantity={level.quantity}
+        low={level.low}
+        critical={level.critical}
+        label={t("dashboard.levelAria", { qty: level.quantity, scale: Math.round(level.scale), status: statusLabel })}
+      />
     </li>
   );
 }
@@ -102,6 +128,14 @@ export function Dashboard() {
   const recent = overview?.recent ?? [];
   const openAlerts: Alert[] = alertsData?.alerts ?? [];
   const attention = counts.critical + counts.low;
+  const trend = overview?.trend;
+  const deltaText = (series?: number[]) => {
+    const d = series ? lastDelta(series) : 0;
+    return d > 0 ? t("dashboard.deltaUp", { n: d }) : d < 0 ? t("dashboard.deltaDown", { n: Math.abs(d) }) : t("dashboard.deltaSame");
+  };
+  const top = overview?.topConsumption ?? null;
+  const wow = top ? weekOverWeek(top.series) : null;
+  const surge = wow !== null && wow >= 2;
   const donutCrit = counts.total ? (counts.ok / counts.total) * 100 : 0;
   const donutLow = counts.total ? donutCrit + (counts.low / counts.total) * 100 : 0;
 
@@ -114,20 +148,33 @@ export function Dashboard() {
             {firstName ? `, ${firstName}` : ""}
           </h1>
           <p className="mt-1 text-slate-400">
-            {attention > 0 ? t("dashboard.attention", { count: attention }) : t("dashboard.allGood")}
+            {attention > 0 && levels[0]
+              ? t("dashboard.attentionUrgent", { count: attention, name: levels[0].name })
+              : attention > 0
+              ? t("dashboard.attention", { count: attention })
+              : t("dashboard.allGood")}
           </p>
         </div>
-        <button onClick={() => refetch()} className="btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
-          <RefreshCw className="h-4 w-4" aria-hidden="true" />
-          {t("dashboard.refresh")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => refetch()} className="btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            {t("dashboard.refresh")}
+          </button>
+          <Link to="/inventory" state={{ create: true }} className="btn-primary px-5 py-2.5 text-sm">
+            {t("dashboard.addItem")}
+          </Link>
+        </div>
       </div>
 
       <section aria-label={t("dashboard.title")} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KpiCard tone="bg-[#fbd9c8] text-[#7a2d0f]" title={t("dashboard.kpiCritical")} value={counts.critical} sub={t("dashboard.kpiCriticalSub")} />
-        <KpiCard tone="bg-[#fdeec2] text-[#6b4e00]" title={t("dashboard.kpiLow")} value={counts.low} sub={t("dashboard.kpiLowSub")} />
-        <KpiCard tone="bg-[#dcebd6] text-[#2f5a3a]" title={t("dashboard.kpiOk")} value={counts.ok} sub={t("dashboard.kpiOutOf", { total: counts.total })} />
-        <KpiCard tone="bg-[#d7e9ef] text-[#1d4d5c]" title={t("dashboard.openAlerts")} value={openAlerts.length} sub={t("dashboard.kpiAlertsSub")} />
+        <KpiCard tone="bg-[#fbd9c8] text-[#7a2d0f]" title={t("dashboard.kpiCritical")} value={counts.critical} sub={deltaText(trend?.critical)} series={trend?.critical} />
+        <KpiCard tone="bg-[#fdeec2] text-[#6b4e00]" title={t("dashboard.kpiLow")} value={counts.low} sub={deltaText(trend?.low)} series={trend?.low} />
+        <KpiCard tone="bg-[#dcebd6] text-[#2f5a3a]" title={t("dashboard.kpiOk")} value={counts.ok} sub={t("dashboard.kpiOutOf", { total: counts.total })} series={trend?.ok} />
+        {overview?.hasCost ? (
+          <KpiCard tone="bg-[#d7e9ef] text-[#1d4d5c]" title={t("dashboard.kpiValue")} value={fmtMoney(overview.stockValue)} sub={t("dashboard.kpiValueSub")} series={trend?.value} />
+        ) : (
+          <KpiCard tone="bg-[#d7e9ef] text-[#1d4d5c]" title={t("dashboard.openAlerts")} value={openAlerts.length} sub={t("dashboard.kpiAlertsSub")} />
+        )}
       </section>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[3fr_2fr]">
@@ -145,6 +192,31 @@ export function Dashboard() {
                 <StockRow key={l.id} level={l} />
               ))}
             </ul>
+          )}
+
+          {top && top.series.length > 0 && (
+            <div className="mt-6 border-t border-surface-700 pt-4">
+              <h3 className="mb-3 text-sm font-bold text-ink">{t("dashboard.consumptionTitle", { name: top.name })}</h3>
+              <div
+                role="img"
+                aria-label={t("dashboard.consumptionAria", { ratio: wow ?? "—" })}
+                className="flex h-[74px] items-end gap-1.5"
+              >
+                {(() => {
+                  const peak = Math.max(...top.series.map((p) => p.qty), 1);
+                  return top.series.map((p, i) => (
+                    <div
+                      key={p.date}
+                      className={cn("flex-1 rounded-t", i >= top.series.length - 7 ? "bg-clay" : "bg-[#cdd9c6]")}
+                      style={{ height: `${Math.max((p.qty / peak) * 100, 4)}%` }}
+                    />
+                  ));
+                })()}
+              </div>
+              <p className={cn("mt-2 text-sm font-semibold", surge ? "text-red-400" : "text-slate-400")}>
+                {surge ? t("dashboard.surge", { ratio: wow }) : t("dashboard.steady")}
+              </p>
+            </div>
           )}
         </section>
 
@@ -202,7 +274,7 @@ export function Dashboard() {
                     <span>
                       {t(`dashboard.mv.${m.transaction_type}`, { defaultValue: m.transaction_type })} · {m.item?.name ?? "—"} · {Math.abs(Number(m.quantity_delta))} {m.item?.unit ?? ""}
                     </span>
-                    <span className="shrink-0 text-slate-400">{fmtDateTime(m.created_at)}</span>
+                    <span className="shrink-0 text-slate-400">{fmtWhen(m.created_at)}</span>
                   </li>
                 ))}
               </ul>

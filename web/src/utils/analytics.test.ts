@@ -53,3 +53,45 @@ describe("dashboard stock levels", () => {
     expect(sortByUrgency(levels).map((l) => l.id)).toEqual(["crit", "low", "ok"]);
   });
 });
+
+import { dailyHealthSeries, lastDelta, netChange } from "./analytics";
+
+describe("dashboard trends", () => {
+  const now = new Date("2026-10-18T12:00:00Z");
+  const items = [
+    { id: "a", quantity: 4, low_stock_threshold: 20, critical_stock_threshold: 8, unit_cost: 10 },
+    { id: "b", quantity: 50, low_stock_threshold: 20, critical_stock_threshold: 8, unit_cost: 2 },
+  ];
+
+  it("uses before/after quantities for the net change, with a type fallback", () => {
+    expect(netChange({ transaction_type: "ISSUE", quantity_delta: 5, quantity_before: 20, quantity_after: 15, created_at: "" })).toBe(-5);
+    expect(netChange({ transaction_type: "RESTOCK", quantity_delta: 5, created_at: "" })).toBe(5);
+    expect(netChange({ transaction_type: "ISSUE", quantity_delta: 5, created_at: "" })).toBe(-5);
+  });
+
+  it("rebuilds earlier days by reversing later movements", () => {
+    // 'a' was restocked from 4 to 24 two days ago -> it was critical before, healthy after
+    const txns = [{ item_id: "a", transaction_type: "RESTOCK", quantity_delta: 20, quantity_before: 4, quantity_after: 24, created_at: "2026-10-16T09:00:00Z" }];
+    const t = dailyHealthSeries(items, txns, 4, now); // 15,16,17,18 Oct
+    // end of 15 Oct: a = 4 (critical); end of 16/17/18: a is 24 only if no later movement... current is 4
+    expect(t.dates).toEqual(["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18"]);
+    expect(t.critical[3]).toBe(1); // today: a = 4
+    expect(t.critical[0]).toBe(1 + 0); // 15 Oct: 4 - (24-4) < 0 clamps to 0 -> critical
+    expect(t.ok[3]).toBe(1); // b stays healthy
+    expect(t.value[3]).toBe(4 * 10 + 50 * 2);
+  });
+
+  it("lastDelta compares today with yesterday", () => {
+    expect(lastDelta([1, 1, 3])).toBe(2);
+    expect(lastDelta([5])).toBe(0);
+  });
+});
+
+import { weekOverWeek } from "./analytics";
+describe("weekOverWeek", () => {
+  it("compares the last 7 days with the previous 7", () => {
+    const series = [...Array(7).fill({ qty: 1 }), ...Array(7).fill({ qty: 2.6 })];
+    expect(weekOverWeek(series)).toBe(2.6);
+    expect(weekOverWeek(Array(14).fill({ qty: 0 }))).toBeNull();
+  });
+});

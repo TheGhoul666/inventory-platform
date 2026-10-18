@@ -41,6 +41,18 @@ uvicorn app.main:app --reload
 python scripts/seed.py
 ```
 
+## Updating a running copy
+
+If the UI does not look like the latest design, your copy is running an old build:
+
+```bash
+git checkout main && git pull
+cd web && npm ci            # picks up new dependencies
+npm run dev                 # restart the dev server (Docker: docker compose up --build web)
+```
+
+Then hard-refresh the browser (Ctrl+Shift+R). A hosted site only changes after it is rebuilt and redeployed from `main` (`cd web && npm run build`, or `web/Dockerfile`).
+
 ## Environment
 
 Copy `.env.example` to `.env` and fill in values from Supabase Dashboard → Settings → API.
