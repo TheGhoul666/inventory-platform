@@ -27,16 +27,13 @@ NOWAIT vs WAIT:
   the client retries with exponential backoff.
 """
 import uuid
-from decimal import Decimal
-from typing import List, Optional, Sequence
+from typing import Optional, Sequence
 
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.models.inventory import InventoryItem, InventoryCategory, InventorySnapshot
-from app.domain.models.transaction import InventoryTransaction, TransactionType, TransactionStatus
-from app.domain.rules.inventory_rules import assert_sufficient_stock, assert_positive_quantity
+from app.domain.models.inventory import InventoryItem, InventorySnapshot
 from app.domain.exceptions import ItemNotFoundError
 
 
@@ -60,7 +57,7 @@ class InventoryRepository:
 
     async def get_by_sku(self, sku: str) -> Optional[InventoryItem]:
         result = await self._session.execute(
-            select(InventoryItem).where(InventoryItem.sku == sku, InventoryItem.is_deleted == False)
+            select(InventoryItem).where(InventoryItem.sku == sku, InventoryItem.is_deleted.is_(False))
         )
         return result.scalar_one_or_none()
 
@@ -75,7 +72,7 @@ class InventoryRepository:
     ) -> tuple[Sequence[InventoryItem], int]:
         query = (
             select(InventoryItem)
-            .where(InventoryItem.is_deleted == False)
+            .where(InventoryItem.is_deleted.is_(False))
             .options(selectinload(InventoryItem.category), selectinload(InventoryItem.warehouse))
         )
         if warehouse_id:
@@ -113,7 +110,7 @@ class InventoryRepository:
         """
         result = await self._session.execute(
             select(InventoryItem)
-            .where(InventoryItem.id == item_id, InventoryItem.is_deleted == False)
+            .where(InventoryItem.id == item_id, InventoryItem.is_deleted.is_(False))
             .with_for_update(nowait=True)
         )
         item = result.scalar_one_or_none()
@@ -145,7 +142,7 @@ class InventoryRepository:
         result = await self._session.execute(
             select(InventoryItem)
             .where(
-                InventoryItem.is_deleted == False,
+                InventoryItem.is_deleted.is_(False),
                 InventoryItem.quantity <= InventoryItem.low_stock_threshold,
             )
             .options(selectinload(InventoryItem.warehouse))
@@ -157,7 +154,7 @@ class InventoryRepository:
         result = await self._session.execute(
             select(InventoryItem)
             .where(
-                InventoryItem.is_deleted == False,
+                InventoryItem.is_deleted.is_(False),
                 InventoryItem.quantity <= InventoryItem.critical_stock_threshold,
             )
             .options(selectinload(InventoryItem.warehouse))

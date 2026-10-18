@@ -12,7 +12,6 @@ import asyncio
 import json
 import logging
 import uuid as uuid_module
-from datetime import datetime, timezone
 
 import aio_pika
 
@@ -54,7 +53,7 @@ async def process_inventory_event(payload: dict) -> None:
             alerts_to_create.append({
                 "alert_type": AlertType.CRITICAL_STOCK,
                 "severity": AlertSeverity.CRITICAL,
-                "title": f"CRITICAL: Stock critically low",
+                "title": "CRITICAL: Stock critically low",
                 "message": f"Item {item_id} has only {quantity} units remaining (critical threshold: {critical_threshold})",
                 "dedup_key": dedup_key,
             })
@@ -64,7 +63,7 @@ async def process_inventory_event(payload: dict) -> None:
             alerts_to_create.append({
                 "alert_type": AlertType.LOW_STOCK,
                 "severity": AlertSeverity.WARNING,
-                "title": f"WARNING: Low stock",
+                "title": "WARNING: Low stock",
                 "message": f"Item {item_id} has {quantity} units remaining (low threshold: {low_threshold})",
                 "dedup_key": dedup_key,
             })

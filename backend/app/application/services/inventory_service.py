@@ -8,12 +8,10 @@ This is the ONLY place allowed to call get_item_with_lock().
 """
 import uuid
 from datetime import datetime, timezone
-from decimal import Decimal
-from typing import Optional
 
 from sqlalchemy.exc import OperationalError
 
-from app.domain.models.inventory import InventoryItem, InventoryCategory
+from app.domain.models.inventory import InventoryItem
 from app.domain.models.transaction import (
     InventoryTransaction,
     TransactionType,
@@ -26,9 +24,7 @@ from app.domain.rules.inventory_rules import (
     assert_transfer_different_warehouses,
 )
 from app.domain.exceptions import (
-    InsufficientStockError,
     InvalidTransactionError,
-    ItemNotFoundError,
 )
 from app.repositories.inventory_repository import InventoryRepository
 from app.repositories.transaction_repository import TransactionRepository

@@ -6,6 +6,7 @@ link directly to transactions so you can answer "which parts were
 used in bus #42's overhaul on 2026-03-15?"
 """
 import uuid
+from typing import TYPE_CHECKING
 from datetime import datetime
 from enum import Enum
 
@@ -14,6 +15,9 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base, AuditMixin, UUIDPKMixin
+
+if TYPE_CHECKING:
+    from app.domain.models.user import User
 
 
 class BusStatus(str, Enum):
@@ -87,5 +91,5 @@ class MaintenanceEvent(UUIDPKMixin, AuditMixin, Base):
     labor_hours: Mapped[float | None] = mapped_column(nullable=True)
     is_warranty: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    bus: Mapped[Bus] = relationship("Bus", back_populates="maintenance_events")
+    bus: Mapped["Bus"] = relationship("Bus", back_populates="maintenance_events")
     technician: Mapped["User"] = relationship("User")

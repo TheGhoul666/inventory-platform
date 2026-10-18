@@ -53,7 +53,7 @@ class EventPublisher:
         await self._channel.set_qos(prefetch_count=100)
 
         # Declare dead-letter exchange first
-        dlx = await self._channel.declare_exchange(
+        await self._channel.declare_exchange(
             self.DLX_NAME, ExchangeType.TOPIC, durable=True
         )
 
@@ -70,6 +70,8 @@ class EventPublisher:
         logger.info("RabbitMQ publisher connected and queues declared")
 
     async def _declare_queue(self, name: str, routing_key: str) -> None:
+        if self._channel is None or self._exchange is None:
+            raise RuntimeError("EventPublisher is not connected")
         queue = await self._channel.declare_queue(
             name,
             durable=True,

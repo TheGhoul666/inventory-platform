@@ -6,11 +6,11 @@ does NOT have UPDATE or DELETE privileges on this table.
 """
 import uuid
 
-from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy import Index, String, Text
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.infrastructure.database.base import Base, UUIDPKMixin, AuditMixin
+from app.infrastructure.database.base import Base, UUIDPKMixin
 
 
 class AuditLog(UUIDPKMixin, Base):

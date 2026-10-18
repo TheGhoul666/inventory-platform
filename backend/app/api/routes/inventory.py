@@ -2,11 +2,10 @@
 Inventory REST API routes — Supabase SDK edition.
 """
 import uuid
-from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.api.dependencies.auth import CurrentUser, require_permission
