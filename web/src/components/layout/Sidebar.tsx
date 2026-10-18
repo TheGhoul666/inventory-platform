@@ -44,23 +44,23 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex flex-col h-full bg-surface-800 border-e border-surface-700 transition-all duration-300",
+        "flex flex-col h-full bg-forest text-ivory transition-all duration-300",
         sidebarCollapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-surface-700">
+      <div className="flex items-center justify-between h-16 px-4 border-b border-white/15">
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-900/50"><Bus className="h-4 w-4 text-white" /></span>
-            <span className="font-semibold tracking-tight text-ink text-sm">{t("nav.appName")}</span>
+            <Bus className="h-6 w-6 text-ivory" aria-hidden="true" />
+            <span className="font-serif text-lg tracking-tight text-ivory">{t("nav.appName")}</span>
           </div>
         )}
         <button
           onClick={toggleSidebar}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!sidebarCollapsed}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors ms-auto"
+          className="p-1.5 rounded-lg text-[#d6e2cf] hover:text-white hover:bg-white/10 transition-colors ms-auto"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform rtl:rotate-180", sidebarCollapsed && "rotate-180")} />
         </button>
@@ -76,10 +76,10 @@ export function Sidebar() {
             title={sidebarCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors group",
+                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors group",
                 isActive
-                  ? "bg-brand-600 text-white shadow-md shadow-brand-900/40"
-                  : "text-slate-400 hover:text-ink hover:bg-surface-700"
+                  ? "bg-ivory text-forest font-semibold"
+                  : "text-[#d6e2cf] hover:text-white hover:bg-white/10"
               )
             }
           >
@@ -90,10 +90,10 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom settings */}
-      <div className="p-2 border-t border-surface-700">
+      <div className="p-2 border-t border-white/15">
         <NavLink
           to="/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#d6e2cf] hover:text-white hover:bg-white/10 transition-colors"
         >
           <Settings className="h-5 w-5 shrink-0" />
           {!sidebarCollapsed && <span>{t("nav.settings")}</span>}

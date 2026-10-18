@@ -38,8 +38,8 @@ function Modal({
 }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-      <div className="card p-6 w-full max-w-md shadow-2xl">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+      <div className="card p-6 w-full max-w-md ">
         <div className="flex items-center justify-between mb-4">
           <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
@@ -537,7 +537,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
       <div className="absolute inset-0 bg-slate-900/30" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="relative w-full max-w-md bg-surface-900 border-s border-surface-700 shadow-2xl flex flex-col h-full overflow-hidden">
+      <div className="relative w-full max-w-md bg-surface-900 border-s border-surface-700  flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-surface-700 shrink-0">
           <div>

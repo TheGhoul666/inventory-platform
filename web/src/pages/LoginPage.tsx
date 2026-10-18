@@ -86,17 +86,27 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-brand-600 mb-4">
-            <Bus className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-ink">{t("auth.welcomeBack")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{t("auth.subtitle")}</p>
+    <div className="min-h-screen lg:grid lg:grid-cols-[5fr_7fr]">
+      <aside className="hidden flex-col justify-between bg-forest p-12 text-ivory lg:flex">
+        <div className="flex items-center gap-3">
+          <Bus className="h-7 w-7" aria-hidden="true" />
+          <span className="font-serif text-xl">{t("nav.appName")}</span>
+        </div>
+        <div>
+          <h1 className="font-serif text-5xl leading-tight">{t("auth.welcomeBack")}</h1>
+          <p className="mt-4 max-w-sm text-lg text-[#d6e2cf]">{t("auth.subtitle")}</p>
+        </div>
+        <div aria-hidden="true" className="h-px w-24 bg-white/30" />
+      </aside>
+
+      <main className="flex min-h-screen items-center justify-center p-6 lg:min-h-0">
+        <div className="w-full max-w-md">
+        <div className="mb-6 lg:hidden">
+          <h1 className="font-serif text-3xl text-ink">{t("auth.welcomeBack")}</h1>
+          <p className="mt-1 text-sm text-slate-400">{t("auth.subtitle")}</p>
         </div>
 
-        <div className="bg-surface-800 rounded-2xl border border-surface-700 p-8 shadow-2xl">
+        <div className="card p-8">
           {/* Tabs */}
           <div role="tablist" className="flex rounded-lg bg-surface-700 p-1 mb-6">
             <button
@@ -278,7 +288,8 @@ export function LoginPage() {
         </div>
 
         <LegalLinks className="mt-6" />
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

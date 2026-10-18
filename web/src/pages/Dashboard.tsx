@@ -31,28 +31,20 @@ import type { Alert } from "@/types";
 function StatCard({
   title,
   value,
-  icon: Icon,
   color,
   subtitle,
 }: {
   title: string;
   value: number | string;
-  icon: React.ElementType;
+  icon?: React.ElementType;
   color: string;
   subtitle?: string;
 }) {
   return (
-    <div className="card p-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-slate-400 text-sm font-medium">{title}</p>
-          <p className={`text-3xl font-bold mt-1 ${color}`}>{value}</p>
-          {subtitle && <p className="text-slate-400 text-xs mt-1">{subtitle}</p>}
-        </div>
-        <div className={`p-3 rounded-lg ${color.includes("red") ? "bg-red-500/10" : color.includes("amber") ? "bg-amber-500/10" : "bg-brand-500/10"}`}>
-          <Icon className={`h-6 w-6 ${color}`} />
-        </div>
-      </div>
+    <div className="card p-5">
+      <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{title}</p>
+      <p className={`font-serif text-4xl mt-2 tabular-nums ${color}`}>{value}</p>
+      {subtitle && <p className="text-slate-400 text-sm mt-1">{subtitle}</p>}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export function Header() {
   const openAlertCount = alertsData?.alerts?.length ?? 0;
 
   return (
-    <header className="h-16 bg-surface-800/95 backdrop-blur border-b border-surface-700 flex items-center justify-between px-6">
+    <header className="h-16 bg-surface-800 border-b border-surface-700 flex items-center justify-between px-6">
       <div className="flex items-center gap-2 text-slate-400 text-sm">
         <span className="text-ink font-medium">{t("auth.welcomeBack")}</span>
         <span>/</span>
@@ -48,7 +48,7 @@ export function Header() {
         >
           <Bell className="h-5 w-5" />
           {openAlertCount > 0 && (
-            <span className="absolute -top-0.5 -end-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
+            <span className="absolute -top-0.5 -end-0.5 h-4 w-4 rounded-sm bg-red-700 text-white text-xs flex items-center justify-center font-bold">
               {openAlertCount > 9 ? "9+" : openAlertCount}
             </span>
           )}

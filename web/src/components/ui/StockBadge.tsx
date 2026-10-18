@@ -18,7 +18,7 @@ export function StockBadge({ quantity, lowThreshold, criticalThreshold, unit = "
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums",
+        "inline-flex items-center gap-1 rounded-sm px-2.5 py-0.5 text-xs font-semibold tabular-nums",
         isCritical
           ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/40"
           : isLow
@@ -26,7 +26,7 @@ export function StockBadge({ quantity, lowThreshold, criticalThreshold, unit = "
           : "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40"
       )}
     >
-      {isCritical && <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />}
+      {isCritical && <span className="h-1.5 w-1.5 rounded-full bg-red-400" />}
       {isLow && !isCritical && <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />}
       {quantity} {unit}
     </span>

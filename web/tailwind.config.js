@@ -5,25 +5,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#0f172a",
+        // "Forest Fleet" theme (custom, from theme-factory's Forest Canopy family): green, ivory, terracotta.
+        ink: "#1c2a1a",
+        forest: "#233d22",
+        ivory: "#faf7ee",
+        accent: "#a8481f",
         brand: {
-          300: "#2f49c9",
-          400: "#3a55e0",
-          500: "#3d58df",
-          600: "#4361ee",
-          700: "#3451d1",
-          900: "#c9d3fb",
+          300: "#2d4a2b",
+          400: "#2f5a2c",
+          500: "#2f5a2c",
+          600: "#2d4a2b",
+          700: "#1f3a1e",
+          900: "#cfdcc8",
         },
-        // Light theme: the former "dark" surface scale, inverted.
         surface: {
-          500: "#8693b3",
-          600: "#c9d2e6",
-          700: "#e6ebf5",
-          800: "#ffffff",
-          900: "#f1f4fa",
+          500: "#8a8f78",
+          600: "#cdc6ad",
+          700: "#ebe5d3",
+          800: "#fffdf7",
+          900: "#f4f0e4",
         },
         // Text shades darkened so they stay AA-readable on light surfaces.
-        slate: { 200: "#1e293b", 300: "#334155", 400: "#475569", 500: "#64748b" },
+        slate: { 200: "#232f21", 300: "#33402f", 400: "#4d5a47", 500: "#687362" },
         red: { 300: "#dc2626", 400: "#b91c1c" },
         amber: { 300: "#b45309", 400: "#a24a06" },
         emerald: { 300: "#047857", 400: "#047857" },
@@ -34,10 +37,11 @@ export default {
       },
       fontFamily: {
         sans: ['"Inter"', '"Heebo"', "system-ui", "-apple-system", "sans-serif"],
+        serif: ['"Iowan Old Style"', '"Palatino Linotype"', "Palatino", "Georgia", '"David"', '"Times New Roman"', "serif"],
       },
-      borderRadius: { xl: "0.875rem", "2xl": "1.125rem" },
+      borderRadius: { lg: "0.375rem", xl: "0.5rem", "2xl": "0.625rem" },
       boxShadow: {
-        card: "0 1px 2px 0 rgb(16 24 40 / 0.05), 0 10px 28px -14px rgb(16 24 40 / 0.18)",
+        card: "0 1px 0 0 rgb(45 74 43 / 0.06)",
       },
     },
   },

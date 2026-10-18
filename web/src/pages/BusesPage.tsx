@@ -14,8 +14,8 @@ import { useDialog } from "@/hooks/useDialog";
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-      <div className="card p-6 w-full max-w-lg shadow-2xl">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+      <div className="card p-6 w-full max-w-lg ">
         <div className="flex items-center justify-between mb-4">
           <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
