@@ -47,6 +47,7 @@ export function TransactionsPage() {
           <p className="text-slate-400 text-sm mt-1">{filtered.length} {t("transactions.title").toLowerCase()}</p>
         </div>
         <select
+          aria-label={t("transactions.type")}
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
           className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500"
@@ -85,7 +86,7 @@ export function TransactionsPage() {
                 ))
               ) : paged.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-16 text-center text-slate-500">
+                  <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
                     No transactions yet.
                   </td>
                 </tr>
@@ -101,10 +102,10 @@ export function TransactionsPage() {
                       {txn.item_name ? (
                         <div>
                           <p className="text-white text-sm">{txn.item_name}</p>
-                          <p className="text-slate-500 text-xs font-mono">{txn.item_sku}</p>
+                          <p className="text-slate-400 text-xs font-mono">{txn.item_sku}</p>
                         </div>
                       ) : (
-                        <span className="text-slate-500 text-xs font-mono">{txn.item_id ? txn.item_id.slice(0, 8) + "…" : "—"}</span>
+                        <span className="text-slate-400 text-xs font-mono">{txn.item_id ? txn.item_id.slice(0, 8) + "…" : "—"}</span>
                       )}
                     </td>
                     <td className={`px-4 py-3 text-end tabular-nums font-medium ${isIncrease ? "text-emerald-400" : "text-red-400"}`}>
@@ -113,7 +114,7 @@ export function TransactionsPage() {
                     <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_before}</td>
                     <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_after}</td>
                     <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDateTime(txn.created_at)}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs max-w-[200px] truncate">{txn.notes || "—"}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs max-w-[200px] truncate">{txn.notes || "—"}</td>
                   </tr>
                   );
                 })

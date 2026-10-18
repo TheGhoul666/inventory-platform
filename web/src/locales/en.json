@@ -286,5 +286,25 @@
   },
   "loading": {
     "session": "Checking your session…"
+  },
+  "legal": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookies & storage",
+    "accessibility": "Accessibility",
+    "navLabel": "Legal",
+    "back": "Back to sign in",
+    "agreePrefix": "I have read and agree to the ",
+    "agreeAnd": " and the ",
+    "agreeRequired": "You need to accept the Terms of Service and Privacy Policy to create an account.",
+    "contact": "Contact"
+  },
+  "a11y": {
+    "skip": "Skip to content",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "closeDialog": "Close dialog",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
   }
 }

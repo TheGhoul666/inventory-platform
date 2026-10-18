@@ -81,7 +81,7 @@ export function AlertsPage() {
             <div className="card p-12 text-center">
               <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-3" />
               <p className="text-slate-300 font-medium">{t("alerts.noAlerts")}</p>
-              <p className="text-slate-500 text-sm mt-1">{t("alerts.allClear")}</p>
+              <p className="text-slate-400 text-sm mt-1">{t("alerts.allClear")}</p>
             </div>
           )
           : alerts.map((alert) => (
@@ -96,11 +96,11 @@ export function AlertsPage() {
                     <span className={`text-xs font-medium ${statusColors[alert.status]}`}>
                       {alert.status}
                     </span>
-                    <span className="text-xs text-slate-600">{alert.type}</span>
+                    <span className="text-xs text-slate-400">{alert.type}</span>
                   </div>
                   <h3 className="font-medium text-white">{alert.title}</h3>
                   <p className="text-slate-400 text-sm mt-0.5">{alert.message}</p>
-                  <p className="text-slate-600 text-xs mt-2">
+                  <p className="text-slate-400 text-xs mt-2">
                     {fmtDateTime(alert.created_at)}
                     {alert.acknowledged_at && (
                       <span className="ms-3">

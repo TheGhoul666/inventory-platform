@@ -7,12 +7,14 @@
  * and mirrored into authStore via onAuthStateChange.
  */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Bus, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
 import { useTranslation } from "react-i18next";
+import { LegalLinks } from "@/components/layout/LegalLinks";
+import { LEGAL_VERSION } from "@/config/business";
 
 type Tab = "signin" | "signup";
 
@@ -30,6 +32,7 @@ export function LoginPage() {
   const [fullName, setFullName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +50,10 @@ export function LoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) {
+      toast.error(t("legal.agreeRequired"));
+      return;
+    }
     if (password.length < 8) {
       toast.error(t("auth.minPassword"));
       return;
@@ -57,7 +64,7 @@ export function LoginPage() {
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { full_name: fullName, terms_accepted_at: new Date().toISOString(), terms_version: LEGAL_VERSION },
         },
       });
       if (error) throw error;
@@ -91,8 +98,13 @@ export function LoginPage() {
 
         <div className="bg-surface-800 rounded-2xl border border-surface-700 p-8 shadow-2xl">
           {/* Tabs */}
-          <div className="flex rounded-lg bg-surface-700 p-1 mb-6">
+          <div role="tablist" className="flex rounded-lg bg-surface-700 p-1 mb-6">
             <button
+              type="button"
+              role="tab"
+              id="tab-signin"
+              aria-selected={tab === "signin"}
+              aria-controls="panel-signin"
               onClick={() => setTab("signin")}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === "signin"
@@ -103,6 +115,11 @@ export function LoginPage() {
               {t("auth.signIn")}
             </button>
             <button
+              type="button"
+              role="tab"
+              id="tab-signup"
+              aria-selected={tab === "signup"}
+              aria-controls="panel-signup"
               onClick={() => setTab("signup")}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === "signup"
@@ -116,35 +133,39 @@ export function LoginPage() {
 
           {/* Sign In Form */}
           {tab === "signin" && (
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4" role="tabpanel" id="panel-signin" aria-labelledby="tab-signin">
               <div>
-                <label className="text-sm text-slate-400 block mb-1.5">{t("auth.email")}</label>
+                <label htmlFor="si-f0" className="text-sm text-slate-300 block mb-1.5">{t("auth.email")}</label>
                 <input
+                  id="si-f0"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="operator@depot.com"
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1.5">{t("auth.password")}</label>
+                <label htmlFor="si-f1" className="text-sm text-slate-300 block mb-1.5">{t("auth.password")}</label>
                 <div className="relative">
                   <input
+                  id="si-f1"
                     type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                    aria-label={showPw ? t("a11y.hidePassword") : t("a11y.showPassword")}
+                    aria-pressed={showPw}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                   >
                     {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -167,7 +188,7 @@ export function LoginPage() {
                     if (error) toast.error(error.message);
                     else toast.success(t("auth.passwordResetSent"));
                   }}
-                  className="w-full text-sm text-slate-400 hover:text-brand-400 transition-colors"
+                  className="w-full text-sm text-slate-300 underline underline-offset-2 hover:text-white transition-colors"
                 >
                   {t("auth.forgotPassword")}
                 </button>
@@ -177,52 +198,73 @@ export function LoginPage() {
 
           {/* Sign Up Form */}
           {tab === "signup" && (
-            <form onSubmit={handleRegister} className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4" role="tabpanel" id="panel-signup" aria-labelledby="tab-signup">
               <div>
-                <label className="text-sm text-slate-400 block mb-1.5">{t("auth.fullName")}</label>
+                <label htmlFor="su-f0" className="text-sm text-slate-300 block mb-1.5">{t("auth.fullName")}</label>
                 <input
+                  id="su-f0"
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   autoComplete="name"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="John Smith"
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1.5">{t("auth.email")}</label>
+                <label htmlFor="su-f1" className="text-sm text-slate-300 block mb-1.5">{t("auth.email")}</label>
                 <input
+                  id="su-f1"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="operator@depot.com"
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1.5">{t("auth.password")}</label>
+                <label htmlFor="su-f2" className="text-sm text-slate-300 block mb-1.5">{t("auth.password")}</label>
                 <div className="relative">
                   <input
+                  id="su-f2"
                     type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={8}
                     autoComplete="new-password"
-                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                     placeholder="Min 8 characters"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw(!showPw)}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                    aria-label={showPw ? t("a11y.hidePassword") : t("a11y.showPassword")}
+                    aria-pressed={showPw}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                   >
                     {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <input
+                  id="su-agree"
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  required
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-surface-600 bg-surface-700 accent-brand-600"
+                />
+                <label htmlFor="su-agree" className="text-sm leading-snug text-slate-300">
+                  {t("legal.agreePrefix")}
+                  <Link to="/terms" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-white">{t("legal.terms")}</Link>
+                  {t("legal.agreeAnd")}
+                  <Link to="/privacy" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-white">{t("legal.privacy")}</Link>
+                </label>
               </div>
               <button
                 type="submit"
@@ -235,9 +277,7 @@ export function LoginPage() {
           )}
         </div>
 
-        <p className="text-center text-slate-600 text-xs mt-6">
-          Powered by Supabase · Bus Inventory Platform v1.0
-        </p>
+        <LegalLinks className="mt-6" />
       </div>
     </div>
   );

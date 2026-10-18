@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import { rolesService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { useTranslation } from "react-i18next";
+import { Field } from "@/components/ui/Field";
+import { useDialog } from "@/hooks/useDialog";
 
 const PERMISSION_LABELS: Record<string, string> = {
   "inventory:read": "קריאת מלאי",
@@ -27,7 +29,7 @@ const roleColors: Record<string, string> = {
 };
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Create Role Modal ─────────────────────────────────────────────────────────
 
@@ -63,35 +65,34 @@ function CreateRoleModal({
 
   const valid = name.trim().length >= 2;
 
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">יצירת תפקיד מותאם</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">יצירת תפקיד מותאם</h3>
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="space-y-3 mb-4">
-          <div>
-            <label className="text-sm text-slate-400 block mb-1">שם התפקיד *</label>
+          <Field label="שם התפקיד *">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="לדוגמה: RegionalManager"
               className={inputCls}
             />
-          </div>
-          <div>
-            <label className="text-sm text-slate-400 block mb-1">תיאור</label>
+          </Field>
+          <Field label="תיאור">
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="תיאור קצר של התפקיד"
               className={inputCls}
             />
-          </div>
+          </Field>
         </div>
 
         <div className="mb-5">
@@ -154,19 +155,19 @@ function RoleCard({
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold text-white">{role.name}</h3>
             {role.is_system && (
-              <span className="flex items-center gap-1 text-xs text-slate-500">
+              <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Lock className="h-3 w-3" /> מערכת
               </span>
             )}
           </div>
           {role.description && (
-            <p className="text-xs text-slate-500 mt-0.5">{role.description}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{role.description}</p>
           )}
         </div>
         {!role.is_system && (
           <button
             onClick={onDelete}
-            className="p-1 rounded text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
             title="מחק תפקיד"
           >
             <Trash2 className="h-4 w-4" />
@@ -176,7 +177,7 @@ function RoleCard({
 
       <div className="flex flex-wrap gap-1.5">
         {role.permissions.length === 0 ? (
-          <span className="text-xs text-slate-600">אין הרשאות</span>
+          <span className="text-xs text-slate-400">אין הרשאות</span>
         ) : (
           role.permissions.map((p) => (
             <span
@@ -189,7 +190,7 @@ function RoleCard({
         )}
       </div>
 
-      <p className="text-xs text-slate-600 mt-2">{role.permissions.length} הרשאות</p>
+      <p className="text-xs text-slate-400 mt-2">{role.permissions.length} הרשאות</p>
     </div>
   );
 }
@@ -226,7 +227,7 @@ function PermissionMatrix({
             <tr key={p} className="hover:bg-surface-700/30">
               <td className="px-3 py-2 text-slate-300 font-mono bg-surface-800 sticky start-0 border-e border-surface-700">
                 {PERMISSION_LABELS[p] ?? p}
-                <span className="block text-slate-600 text-[10px]">{p}</span>
+                <span className="block text-slate-400 text-[10px]">{p}</span>
               </td>
               {roles.map((r) => (
                 <td key={r.name} className="px-3 py-2 text-center">

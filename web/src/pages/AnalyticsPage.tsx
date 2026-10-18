@@ -65,7 +65,7 @@ export function AnalyticsPage() {
       <div className="card p-4">
         <label htmlFor="analytics-item" className="text-sm text-slate-400 block mb-2">{t("analytics.selectItem")}</label>
         <div className="relative">
-          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
           <input
             id="analytics-item"
             value={selectedItem ? `${selectedItem.sku} — ${selectedItem.name}` : search}
@@ -73,7 +73,7 @@ export function AnalyticsPage() {
             onChange={(e) => { setSearch(e.target.value); setShowDropdown(true); setSelectedItem(null); }}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             placeholder={t("analytics.searchPlaceholder")}
-            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
           {showDropdown && items.length > 0 && (
             <div className="absolute top-full start-0 end-0 mt-1 bg-surface-700 border border-surface-600 rounded-lg shadow-xl z-20 overflow-hidden">
@@ -85,7 +85,7 @@ export function AnalyticsPage() {
                 >
                   <div>
                     <span className="text-white text-sm font-medium">{item.name}</span>
-                    <span className="text-slate-500 text-xs ms-2 font-mono">{item.sku}</span>
+                    <span className="text-slate-400 text-xs ms-2 font-mono">{item.sku}</span>
                   </div>
                   <span className="text-slate-400 text-xs shrink-0">
                     {item.quantity} {item.unit}
@@ -106,7 +106,7 @@ export function AnalyticsPage() {
               <p className="text-3xl font-bold text-white mt-1">
                 {usage?.daily_consumption_rate?.toFixed(2) ?? "—"}
               </p>
-              <p className="text-slate-500 text-xs mt-1">{t("analytics.perDayAvg", { unit: selectedItem.unit })}</p>
+              <p className="text-slate-400 text-xs mt-1">{t("analytics.perDayAvg", { unit: selectedItem.unit })}</p>
             </div>
 
             <div className="card p-6">
@@ -122,7 +122,7 @@ export function AnalyticsPage() {
                   ? t("analytics.daysUnit", { n: depletion.predicted_days_left.toFixed(1) })
                   : "—"}
               </p>
-              <p className="text-slate-500 text-xs mt-1">{t("analytics.atCurrentRate")}</p>
+              <p className="text-slate-400 text-xs mt-1">{t("analytics.atCurrentRate")}</p>
             </div>
 
             <div className="card p-6">
@@ -132,10 +132,10 @@ export function AnalyticsPage() {
                   <p className={`text-3xl font-bold mt-1 ${anomaly.is_anomaly ? "text-red-400" : "text-emerald-400"}`}>
                     {anomaly.is_anomaly ? t("analytics.spike") : t("analytics.normal")}
                   </p>
-                  <p className="text-slate-500 text-xs mt-1">{t("analytics.ratio", { ratio: anomaly.ratio })}</p>
+                  <p className="text-slate-400 text-xs mt-1">{t("analytics.ratio", { ratio: anomaly.ratio })}</p>
                 </>
               ) : (
-                <p className="text-3xl font-bold text-slate-600 mt-1">—</p>
+                <p className="text-3xl font-bold text-slate-400 mt-1">—</p>
               )}
             </div>
           </div>
@@ -181,7 +181,7 @@ export function AnalyticsPage() {
 
           {emaData.length === 0 && usage && (
             <div className="card p-8 text-center">
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 {t("analytics.notEnough")}
               </p>
             </div>

@@ -6,16 +6,19 @@ import { busService, warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { Field } from "@/components/ui/Field";
+import { useDialog } from "@/hooks/useDialog";
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -25,17 +28,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-emerald-500/15 text-emerald-400",
@@ -238,8 +232,8 @@ export function BusesPage() {
               ) : buses.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-16 text-center">
-                    <Bus className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">{t("buses.noBuses")}</p>
+                    <Bus className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">{t("buses.noBuses")}</p>
                   </td>
                 </tr>
               ) : (

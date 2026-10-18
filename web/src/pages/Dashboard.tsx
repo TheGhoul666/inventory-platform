@@ -47,7 +47,7 @@ function StatCard({
         <div>
           <p className="text-slate-400 text-sm font-medium">{title}</p>
           <p className={`text-3xl font-bold mt-1 ${color}`}>{value}</p>
-          {subtitle && <p className="text-slate-500 text-xs mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-slate-400 text-xs mt-1">{subtitle}</p>}
         </div>
         <div className={`p-3 rounded-lg ${color.includes("red") ? "bg-red-500/10" : color.includes("amber") ? "bg-amber-500/10" : "bg-brand-500/10"}`}>
           <Icon className={`h-6 w-6 ${color}`} />
@@ -149,13 +149,13 @@ export function Dashboard() {
           </div>
           <div className="divide-y divide-surface-700">
             {criticalItems.length === 0 ? (
-              <p className="p-6 text-center text-slate-500 text-sm">{t("dashboard.noCritical")}</p>
+              <p className="p-6 text-center text-slate-400 text-sm">{t("dashboard.noCritical")}</p>
             ) : (
               criticalItems.map((item: any) => (
                 <div key={item.id} className="p-4 flex items-center justify-between hover:bg-surface-700/50 transition-colors">
                   <div>
                     <p className="font-medium text-white text-sm">{item.name}</p>
-                    <p className="text-slate-500 text-xs font-mono">{item.sku}</p>
+                    <p className="text-slate-400 text-xs font-mono">{item.sku}</p>
                   </div>
                   <StockBadge
                     quantity={item.quantity}
@@ -178,7 +178,7 @@ export function Dashboard() {
           </div>
           <div className="divide-y divide-surface-700">
             {openAlerts.length === 0 ? (
-              <p className="p-6 text-center text-slate-500 text-sm">{t("dashboard.noAlerts")}</p>
+              <p className="p-6 text-center text-slate-400 text-sm">{t("dashboard.noAlerts")}</p>
             ) : (
               openAlerts.map((alert) => (
                 <div key={alert.id} className="p-4 hover:bg-surface-700/50 transition-colors">
@@ -189,7 +189,7 @@ export function Dashboard() {
                     </div>
                     <AlertBadge severity={alert.severity} />
                   </div>
-                  <p className="text-slate-600 text-xs mt-1.5">
+                  <p className="text-slate-400 text-xs mt-1.5">
                     {fmtDateTime(alert.created_at)}
                   </p>
                 </div>

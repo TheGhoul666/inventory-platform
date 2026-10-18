@@ -20,6 +20,8 @@ import { inventoryService, warehouseService, busService } from "@/services/inven
 import { extractError as getError } from "@/services/api";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { useTranslation } from "react-i18next";
+import { Field } from "@/components/ui/Field";
+import { useDialog } from "@/hooks/useDialog";
 import { fmtDate } from "@/utils/format";
 import type { InventoryItem, Transaction } from "@/types";
 
@@ -34,12 +36,13 @@ function Modal({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -83,23 +86,8 @@ function ModalActions({
 
 // ── Field helper ────────────────────────────────────────────────────────────
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Issue modal ─────────────────────────────────────────────────────────────
 
@@ -413,7 +401,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
         <div className="bg-surface-700 rounded-lg p-3 text-sm">
           <p className="text-slate-400 text-xs mb-0.5">Source</p>
           <p className="text-white font-medium">{item.name}</p>
-          <p className="text-slate-500 text-xs font-mono">
+          <p className="text-slate-400 text-xs font-mono">
             Available: {item.available_quantity} {item.unit}
           </p>
         </div>
@@ -451,7 +439,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
                 </div>
                 <button
                   onClick={() => setDestItem(null)}
-                  className="text-slate-500 hover:text-slate-300 transition-colors"
+                  className="text-slate-400 hover:text-slate-300 transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -542,8 +530,9 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
     WRITE_OFF: "text-slate-400",
   };
 
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-40 flex justify-end">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-40 flex justify-end">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
@@ -554,11 +543,11 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
           <div>
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-brand-400" />
-              <h2 className="text-lg font-semibold text-white">{item.name}</h2>
+              <h2 id={dialog.titleId} className="text-lg font-semibold text-white">{item.name}</h2>
             </div>
-            <p className="text-slate-500 text-xs font-mono mt-0.5">{item.sku}</p>
+            <p className="text-slate-400 text-xs font-mono mt-0.5">{item.sku}</p>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors mt-0.5">
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors mt-0.5">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -573,9 +562,9 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
               { label: "Available", value: item.available_quantity, cls: "text-emerald-400" },
             ].map(({ label, value, cls }) => (
               <div key={label} className="bg-surface-800 rounded-lg p-3 text-center">
-                <p className="text-slate-500 text-xs">{label}</p>
+                <p className="text-slate-400 text-xs">{label}</p>
                 <p className={`text-xl font-bold mt-0.5 ${cls}`}>{value}</p>
-                <p className="text-slate-600 text-xs">{item.unit}</p>
+                <p className="text-slate-400 text-xs">{item.unit}</p>
               </div>
             ))}
           </div>
@@ -629,13 +618,13 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
           {/* Transaction history */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="h-4 w-4 text-slate-500" />
+              <Clock className="h-4 w-4 text-slate-400" />
               <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                 Recent Transactions
               </p>
             </div>
             {transactions.length === 0 ? (
-              <p className="text-slate-600 text-sm text-center py-4">No transactions yet</p>
+              <p className="text-slate-400 text-sm text-center py-4">No transactions yet</p>
             ) : (
               <div className="space-y-2">
                 {transactions.slice(0, 20).map((tx) => (
@@ -648,14 +637,14 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
                         {tx.type}
                       </span>
                       {tx.notes && (
-                        <span className="text-slate-500 text-xs truncate">{tx.notes}</span>
+                        <span className="text-slate-400 text-xs truncate">{tx.notes}</span>
                       )}
                     </div>
                     <div className="text-end shrink-0 ms-2">
                       <span className={`font-medium tabular-nums ${tx.quantity_delta > 0 ? "text-emerald-400" : "text-red-400"}`}>
                         {tx.quantity_delta > 0 ? "+" : ""}{tx.quantity_delta}
                       </span>
-                      <p className="text-slate-600 text-xs">
+                      <p className="text-slate-400 text-xs">
                         {fmtDate(tx.created_at)}
                       </p>
                     </div>
@@ -738,7 +727,7 @@ export function InventoryPage() {
           <p className="text-slate-300 text-sm mb-1">
             Permanently delete <span className="text-white font-semibold">{deleteTarget.name}</span>?
           </p>
-          <p className="text-slate-500 text-xs mb-6">
+          <p className="text-slate-400 text-xs mb-6">
             This cannot be undone. Items with existing transactions cannot be deleted — write off the stock first.
           </p>
           <ModalActions
@@ -758,7 +747,7 @@ export function InventoryPage() {
             Write off all <span className="text-white font-semibold">{writeOffTarget.available_quantity} {writeOffTarget.unit}</span> of{" "}
             <span className="text-white font-semibold">{writeOffTarget.name}</span>?
           </p>
-          <p className="text-slate-500 text-xs mb-6">
+          <p className="text-slate-400 text-xs mb-6">
             Stock will be set to zero. The transaction is recorded in the audit log.
           </p>
           <ModalActions
@@ -792,12 +781,13 @@ export function InventoryPage() {
       {/* Filters */}
       <div className="flex gap-3 items-center flex-wrap">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+            aria-label={t("common.search")}
             placeholder="Search SKU or name..."
-            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
         </div>
         <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -839,7 +829,7 @@ export function InventoryPage() {
                 ))
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     {t("inventory.noItems")}
                   </td>
                 </tr>

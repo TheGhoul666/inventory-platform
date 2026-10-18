@@ -37,12 +37,14 @@ export function AuditLogsPage() {
           <input
             value={resourceType}
             onChange={(e) => { setResourceType(e.target.value); setPage(0); }}
+            aria-label={t("audit.resource")}
             placeholder="Resource type…"
             className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
           />
           <input
             value={actionFilter}
             onChange={(e) => { setActionFilter(e.target.value); setPage(0); }}
+            aria-label={t("audit.action")}
             placeholder="Action…"
             className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
           />
@@ -76,8 +78,8 @@ export function AuditLogsPage() {
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-16 text-center">
-                    <ShieldCheck className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">{t("audit.noLogs")}</p>
+                    <ShieldCheck className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">{t("audit.noLogs")}</p>
                   </td>
                 </tr>
               ) : (
@@ -91,8 +93,8 @@ export function AuditLogsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs font-mono">{log.resource_type}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs font-mono">{log.resource_id ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs max-w-[200px] truncate">{log.notes ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs font-mono">{log.resource_id ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs max-w-[200px] truncate">{log.notes ?? "—"}</td>
                   </tr>
                 ))
               )}

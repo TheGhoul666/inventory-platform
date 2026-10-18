@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { useAuthStore } from "@/store/authStore";
 import { useRealtimeInventory } from "@/hooks/useRealtimeInventory";
 import { useTranslation } from "react-i18next";
+import { LegalLinks } from "@/components/layout/LegalLinks";
 
 export function AppLayout() {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -34,6 +35,9 @@ export function AppLayout() {
         <main id="main" className="flex-1 overflow-y-auto p-4 md:p-6">
           <Outlet />
         </main>
+        <footer className="border-t border-surface-700 bg-surface-800/60 px-4 py-2">
+          <LegalLinks />
+        </footer>
       </div>
     </div>
   );

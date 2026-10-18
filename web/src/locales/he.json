@@ -286,5 +286,25 @@
   },
   "loading": {
     "session": "בודק את ההתחברות…"
+  },
+  "legal": {
+    "privacy": "מדיניות פרטיות",
+    "terms": "תנאי שימוש",
+    "cookies": "קבצי Cookie ואחסון",
+    "accessibility": "הצהרת נגישות",
+    "navLabel": "מידע משפטי",
+    "back": "חזרה להתחברות",
+    "agreePrefix": "קראתי והסכמתי ל",
+    "agreeAnd": " ו",
+    "agreeRequired": "כדי ליצור חשבון יש לאשר את תנאי השימוש ואת מדיניות הפרטיות.",
+    "contact": "יצירת קשר"
+  },
+  "a11y": {
+    "skip": "דלג לתוכן",
+    "showPassword": "הצג סיסמה",
+    "hidePassword": "הסתר סיסמה",
+    "closeDialog": "סגור חלון",
+    "expandSidebar": "הרחב סרגל צד",
+    "collapseSidebar": "כווץ סרגל צד"
   }
 }
