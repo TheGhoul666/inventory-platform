@@ -36,7 +36,7 @@ class RedisClient:
         return self._client
 
     async def connect(self) -> None:
-        self._client = aioredis.from_url(
+        client = aioredis.from_url(
             settings.REDIS_URL,
             encoding="utf-8",
             decode_responses=True,
@@ -45,7 +45,8 @@ class RedisClient:
             retry_on_timeout=True,
             health_check_interval=30,
         )
-        await self._client.ping()
+        await client.ping()
+        self._client = client
         logger.info("Redis connected")
 
     async def disconnect(self) -> None:
