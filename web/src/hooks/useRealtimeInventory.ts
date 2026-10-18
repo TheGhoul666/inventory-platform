@@ -35,9 +35,23 @@ export function useRealtimeInventory() {
           // Invalidate the affected item and the list
           const itemId = (payload.new as any)?.id ?? (payload.old as any)?.id;
           qc.invalidateQueries({ queryKey: ["inventory", "items"] });
+          qc.invalidateQueries({ queryKey: ["analytics"] }); // dashboard KPIs, levels and trends
           if (itemId) {
             qc.invalidateQueries({ queryKey: ["inventory", "item", itemId] });
           }
+        }
+      )
+      // New stock movements (feed the dashboard trends and latest-movements list)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "inventory_transactions",
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["analytics"] });
+          qc.invalidateQueries({ queryKey: ["inventory"] });
         }
       )
       // New alerts
