@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, RotateCcw } from "lucide-react";
 import { inventoryService } from "@/services/inventoryService";
+import { fmtDateTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const TYPE_CONFIG: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
   ISSUE: { label: "Issue", cls: "bg-red-500/15 text-red-400", Icon: ArrowDownCircle },
@@ -38,45 +40,40 @@ export function TransactionsPage() {
   const filtered = typeFilter ? allTxns.filter((t: any) => t.type === typeFilter) : allTxns;
   const paged = filtered;
 
-  function fmt(iso: string | null) {
-    if (!iso) return "—";
-    return new Date(iso).toLocaleString("en-GB", {
-      day: "2-digit", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    });
-  }
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t("transactions.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{filtered.length} {t("transactions.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("transactions.title")}</>}
+        subtitle={<>{filtered.length} {t("transactions.title").toLowerCase()}</>}
+        actions={
+          <>
         <select
+          aria-label={t("transactions.type")}
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
-          className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500"
+          className="bg-white border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500"
         >
           <option value="">{t("common.all")}</option>
           <option value="ISSUE">{t("transactions.issue")}</option>
           <option value="RESTOCK">{t("transactions.restock")}</option>
           <option value="TRANSFER">{t("transactions.transfer")}</option>
         </select>
-      </div>
+          </>
+        }
+      />
 
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Item</th>
-                <th className="px-4 py-3 text-right">Qty Δ</th>
-                <th className="px-4 py-3 text-right">Before</th>
-                <th className="px-4 py-3 text-right">After</th>
-                <th className="px-4 py-3 text-left">Date</th>
-                <th className="px-4 py-3 text-left">Notes</th>
+                <th className="px-4 py-3 text-start">Type</th>
+                <th className="px-4 py-3 text-start">Item</th>
+                <th className="px-4 py-3 text-end">Qty Δ</th>
+                <th className="px-4 py-3 text-end">Before</th>
+                <th className="px-4 py-3 text-end">After</th>
+                <th className="px-4 py-3 text-start">Date</th>
+                <th className="px-4 py-3 text-start">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -92,7 +89,7 @@ export function TransactionsPage() {
                 ))
               ) : paged.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-16 text-center text-slate-500">
+                  <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
                     No transactions yet.
                   </td>
                 </tr>
@@ -107,20 +104,20 @@ export function TransactionsPage() {
                     <td className="px-4 py-3">
                       {txn.item_name ? (
                         <div>
-                          <p className="text-white text-sm">{txn.item_name}</p>
-                          <p className="text-slate-500 text-xs font-mono">{txn.item_sku}</p>
+                          <p className="text-ink text-sm">{txn.item_name}</p>
+                          <p className="text-slate-400 text-xs font-mono">{txn.item_sku}</p>
                         </div>
                       ) : (
-                        <span className="text-slate-500 text-xs font-mono">{txn.item_id ? txn.item_id.slice(0, 8) + "…" : "—"}</span>
+                        <span className="text-slate-400 text-xs font-mono">{txn.item_id ? txn.item_id.slice(0, 8) + "…" : "—"}</span>
                       )}
                     </td>
-                    <td className={`px-4 py-3 text-right tabular-nums font-medium ${isIncrease ? "text-emerald-400" : "text-red-400"}`}>
+                    <td className={`px-4 py-3 text-end tabular-nums font-medium ${isIncrease ? "text-emerald-400" : "text-red-400"}`}>
                       {isIncrease ? "+" : "-"}{Math.abs(txn.quantity_delta)}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-400">{txn.quantity_before}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-400">{txn.quantity_after}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmt(txn.created_at)}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs max-w-[200px] truncate">{txn.notes || "—"}</td>
+                    <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_before}</td>
+                    <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_after}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDateTime(txn.created_at)}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs max-w-[200px] truncate">{txn.notes || "—"}</td>
                   </tr>
                   );
                 })

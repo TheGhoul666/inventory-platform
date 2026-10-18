@@ -65,7 +65,7 @@ class AuthService:
             result.append({"name": name, "permissions": perms, "is_system": True, "description": None})
 
         try:
-            stmt = select(Role).where(Role.is_system_role == False).options(selectinload(Role.permissions))
+            stmt = select(Role).where(Role.is_system_role.is_(False)).options(selectinload(Role.permissions))
             rows = (await db.scalars(stmt)).all()
             for role in rows:
                 result.append({

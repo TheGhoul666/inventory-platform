@@ -29,8 +29,14 @@ class RedisClient:
     def __init__(self):
         self._client: Optional[aioredis.Redis] = None
 
+    @property
+    def _conn(self) -> "aioredis.Redis":
+        if self._client is None:
+            raise RuntimeError("Redis client is not connected")
+        return self._client
+
     async def connect(self) -> None:
-        self._client = aioredis.from_url(
+        client = aioredis.from_url(
             settings.REDIS_URL,
             encoding="utf-8",
             decode_responses=True,
@@ -39,7 +45,8 @@ class RedisClient:
             retry_on_timeout=True,
             health_check_interval=30,
         )
-        await self._client.ping()
+        await client.ping()
+        self._client = client
         logger.info("Redis connected")
 
     async def disconnect(self) -> None:
@@ -48,14 +55,15 @@ class RedisClient:
 
     async def get(self, key: str) -> Optional[str]:
         try:
-            return await self._client.get(key)
+            value = await self._conn.get(key)
+            return None if value is None else str(value)
         except Exception as e:
             logger.warning(f"Redis GET failed for {key}: {e}")
             return None
 
     async def set(self, key: str, value: str, ttl: int = 300) -> None:
         try:
-            await self._client.setex(key, ttl, value)
+            await self._conn.setex(key, ttl, value)
         except Exception as e:
             logger.warning(f"Redis SET failed for {key}: {e}")
 
@@ -73,7 +81,7 @@ class RedisClient:
 
     async def delete(self, *keys: str) -> None:
         try:
-            await self._client.delete(*keys)
+            await self._conn.delete(*keys)
         except Exception as e:
             logger.warning(f"Redis DELETE failed: {e}")
 
@@ -83,9 +91,9 @@ class RedisClient:
         try:
             cursor = 0
             while True:
-                cursor, keys = await self._client.scan(cursor, match=pattern, count=100)
+                cursor, keys = await self._conn.scan(cursor, match=pattern, count=100)
                 if keys:
-                    await self._client.delete(*keys)
+                    await self._conn.delete(*keys)
                 if cursor == 0:
                     break
         except Exception as e:
@@ -97,8 +105,8 @@ class RedisClient:
         Returns True if request is allowed, False if rate limited.
         """
         try:
-            pipe = self._client.pipeline()
-            pipe.incr(key)
+            pipe = self._conn.pipeline()
+            pipe.incr(key)  # type: ignore[misc]
             pipe.expire(key, window_seconds)
             results = await pipe.execute()
             count = results[0]
@@ -108,7 +116,7 @@ class RedisClient:
 
     async def health_check(self) -> bool:
         try:
-            return await self._client.ping()
+            return bool(await self._conn.ping())
         except Exception:
             return False
 

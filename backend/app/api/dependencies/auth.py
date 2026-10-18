@@ -51,11 +51,10 @@ async def get_current_user(
     try:
         data = extract_user_from_token(credentials.credentials)
         return CurrentUser(data)
-    except (JWTError, KeyError, ValueError) as _jwt_exc:
-        import traceback; traceback.print_exc()
+    except (JWTError, KeyError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid or expired Supabase token: {_jwt_exc}",
+            detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

@@ -14,6 +14,7 @@ Transaction types:
   WRITE_OFF  — damaged/expired goods removal
 """
 import uuid
+from typing import TYPE_CHECKING
 from decimal import Decimal
 from enum import Enum
 
@@ -22,6 +23,12 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base, AuditMixin, UUIDPKMixin
+
+if TYPE_CHECKING:
+    from app.domain.models.bus import Bus, MaintenanceEvent
+    from app.domain.models.inventory import InventoryItem
+    from app.domain.models.user import User
+    from app.domain.models.warehouse import Warehouse
 
 
 class TransactionType(str, Enum):

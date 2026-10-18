@@ -11,7 +11,6 @@ from app.infrastructure.cache.redis_client import redis_client
 from app.infrastructure.queue.publisher import event_publisher
 from app.repositories.inventory_repository import InventoryRepository
 from app.repositories.transaction_repository import TransactionRepository
-from app.repositories.user_repository import UserRepository, RefreshTokenRepository
 from app.repositories.audit_repository import AuditRepository
 from app.application.services.inventory_service import InventoryService
 from app.application.services.analytics_service import AnalyticsService
@@ -39,13 +38,9 @@ def get_analytics_service(
     )
 
 
-def get_auth_service(
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> AuthService:
-    return AuthService(
-        user_repo=UserRepository(db),
-        token_repo=RefreshTokenRepository(db),
-    )
+def get_auth_service() -> AuthService:
+    # AuthService talks to the Supabase Admin API; it takes no repositories.
+    return AuthService()
 
 
 def get_transaction_repo(

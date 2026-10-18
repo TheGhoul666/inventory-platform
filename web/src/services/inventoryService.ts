@@ -4,7 +4,20 @@
  */
 import api from "./api";
 import { supabase } from "@/lib/supabase";
+import {
+  averageRate,
+  consumptionRateByItem,
+  sortByUrgency,
+  toStockLevel,
+  dailyConsumption,
+  detectAnomaly,
+  emaSeries,
+  predictedDaysLeft,
+} from "@/utils/analytics";
 import type {
+  AnomalyResult,
+  DepletionForecast,
+  UsageAnalytics,
   InventoryItem,
   PaginatedResponse,
   Transaction,
@@ -115,6 +128,18 @@ export const inventoryService = {
   },
 };
 
+async function loadConsumption(item_id: string, days: number) {
+  const since = new Date(Date.now() - days * 86_400_000).toISOString();
+  const { data, error } = await supabase.from("inventory_transactions")
+    .select("transaction_type, quantity_delta, created_at")
+    .eq("item_id", item_id)
+    .eq("is_deleted", false)
+    .gte("created_at", since)
+    .limit(1000);
+  if (error) throw error;
+  return dailyConsumption(data ?? [], days);
+}
+
 export const analyticsService = {
   getDashboardSummary: async () => {
     const { data: items, error } = await supabase.from("inventory_items")
@@ -135,18 +160,57 @@ export const analyticsService = {
     };
   },
 
-  getItemUsage: async (item_id: string, _days = 30) => {
-    const { data } = await supabase.from("inventory_transactions")
-      .select("*")
-      .eq("item_id", item_id)
-      .eq("is_deleted", false)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    return { usage: data ?? [] };
+  /** Stock levels with a days-left forecast, plus the latest movements, for the dashboard. */
+  getDashboardOverview: async (days = 14) => {
+    const since = new Date(Date.now() - days * 86_400_000).toISOString();
+    const [itemsRes, txRes, recentRes] = await Promise.all([
+      supabase.from("inventory_items")
+        .select("id, name, sku, unit, quantity, low_stock_threshold, critical_stock_threshold")
+        .eq("is_deleted", false),
+      supabase.from("inventory_transactions")
+        .select("item_id, transaction_type, quantity_delta, created_at")
+        .eq("is_deleted", false)
+        .gte("created_at", since)
+        .limit(2000),
+      supabase.from("inventory_transactions")
+        .select("id, transaction_type, quantity_delta, created_at, item:inventory_items(name, unit)")
+        .eq("is_deleted", false)
+        .order("created_at", { ascending: false })
+        .limit(4),
+    ]);
+    if (itemsRes.error) throw itemsRes.error;
+    const rates = consumptionRateByItem(txRes.data ?? [], days);
+    const levels = (itemsRes.data ?? []).map((i) => toStockLevel(i, rates));
+    return {
+      levels: sortByUrgency(levels).slice(0, 5),
+      counts: {
+        total: levels.length,
+        critical: levels.filter((l) => l.status === "critical").length,
+        low: levels.filter((l) => l.status === "low").length,
+        ok: levels.filter((l) => l.status === "ok").length,
+      },
+      recent: (recentRes.data ?? []) as unknown as Array<{
+        id: string; transaction_type: string; quantity_delta: number; created_at: string; item: { name: string; unit?: string } | null;
+      }>,
+    };
   },
 
-  getPredictedDepletion: async (_item_id: string) => ({ prediction: null }),
-  getAnomalies: async (_item_id: string) => ({ anomalies: [] }),
+  getItemUsage: async (item_id: string, days = 30): Promise<UsageAnalytics> => {
+    const series = await loadConsumption(item_id, days);
+    return { item_id, period_days: days, daily_consumption_rate: averageRate(series) };
+  },
+
+  getPredictedDepletion: async (item_id: string, quantity: number, days = 30): Promise<DepletionForecast> => {
+    const series = await loadConsumption(item_id, days);
+    return {
+      item_id,
+      predicted_days_left: predictedDaysLeft(quantity, averageRate(series)),
+      ema_trend: emaSeries(series),
+    };
+  },
+
+  getAnomalies: async (item_id: string, days = 30): Promise<AnomalyResult> =>
+    detectAnomaly(await loadConsumption(item_id, days), item_id),
 };
 
 export const alertService = {

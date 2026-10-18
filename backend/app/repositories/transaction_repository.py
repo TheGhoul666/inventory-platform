@@ -90,7 +90,6 @@ class TransactionRepository:
         days: int = 30,
     ) -> dict:
         """Aggregate ISSUE transactions for predictive analytics."""
-        from sqlalchemy import text
         from datetime import datetime, timezone, timedelta
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)

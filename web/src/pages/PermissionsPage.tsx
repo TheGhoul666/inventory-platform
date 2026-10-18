@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, Plus, Trash2, X, Check, Lock } from "lucide-react";
+import { Plus, Trash2, X, Check, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { rolesService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Field } from "@/components/ui/Field";
+import { useDialog } from "@/hooks/useDialog";
 
 const PERMISSION_LABELS: Record<string, string> = {
   "inventory:read": "קריאת מלאי",
@@ -27,7 +30,7 @@ const roleColors: Record<string, string> = {
 };
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Create Role Modal ─────────────────────────────────────────────────────────
 
@@ -63,54 +66,53 @@ function CreateRoleModal({
 
   const valid = name.trim().length >= 2;
 
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-lg shadow-2xl">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+      <div className="card p-6 w-full max-w-lg ">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">יצירת תפקיד מותאם</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">יצירת תפקיד מותאם</h3>
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="space-y-3 mb-4">
-          <div>
-            <label className="text-sm text-slate-400 block mb-1">שם התפקיד *</label>
+          <Field label="שם התפקיד *">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="לדוגמה: RegionalManager"
               className={inputCls}
             />
-          </div>
-          <div>
-            <label className="text-sm text-slate-400 block mb-1">תיאור</label>
+          </Field>
+          <Field label="תיאור">
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="תיאור קצר של התפקיד"
               className={inputCls}
             />
-          </div>
+          </Field>
         </div>
 
         <div className="mb-5">
           <p className="text-sm text-slate-400 mb-2">הרשאות</p>
-          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-1">
+          <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pe-1">
             {allPermissions.map((p) => (
               <button
                 key={p}
                 onClick={() => toggle(p)}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors text-left ${
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors text-start ${
                   selected.has(p)
                     ? "bg-brand-600 text-white"
-                    : "bg-surface-700 text-slate-400 hover:text-white"
+                    : "bg-surface-700 text-slate-400 hover:text-ink"
                 }`}
               >
                 <div className={`h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 ${
-                  selected.has(p) ? "bg-white border-white" : "border-slate-500"
+                  selected.has(p) ? "bg-brand-600 border-brand-600" : "border-slate-500"
                 }`}>
-                  {selected.has(p) && <Check className="h-2.5 w-2.5 text-brand-600" />}
+                  {selected.has(p) && <Check className="h-2.5 w-2.5 text-white" />}
                 </div>
                 {PERMISSION_LABELS[p] ?? p}
               </button>
@@ -128,7 +130,7 @@ function CreateRoleModal({
           <button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending || !valid}
-            className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+            className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
           >
             {mutation.isPending ? "יוצר…" : "צור תפקיד"}
           </button>
@@ -152,21 +154,21 @@ function RoleCard({
       <div className="flex items-start justify-between mb-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-white">{role.name}</h3>
+            <h3 className="text-sm font-semibold text-ink">{role.name}</h3>
             {role.is_system && (
-              <span className="flex items-center gap-1 text-xs text-slate-500">
+              <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Lock className="h-3 w-3" /> מערכת
               </span>
             )}
           </div>
           {role.description && (
-            <p className="text-xs text-slate-500 mt-0.5">{role.description}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{role.description}</p>
           )}
         </div>
         {!role.is_system && (
           <button
             onClick={onDelete}
-            className="p-1 rounded text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
             title="מחק תפקיד"
           >
             <Trash2 className="h-4 w-4" />
@@ -176,7 +178,7 @@ function RoleCard({
 
       <div className="flex flex-wrap gap-1.5">
         {role.permissions.length === 0 ? (
-          <span className="text-xs text-slate-600">אין הרשאות</span>
+          <span className="text-xs text-slate-400">אין הרשאות</span>
         ) : (
           role.permissions.map((p) => (
             <span
@@ -189,7 +191,7 @@ function RoleCard({
         )}
       </div>
 
-      <p className="text-xs text-slate-600 mt-2">{role.permissions.length} הרשאות</p>
+      <p className="text-xs text-slate-400 mt-2">{role.permissions.length} הרשאות</p>
     </div>
   );
 }
@@ -208,7 +210,7 @@ function PermissionMatrix({
       <table className="w-full text-xs border-collapse">
         <thead>
           <tr>
-            <th className="px-3 py-2 text-left text-slate-400 font-medium border-b border-surface-700 bg-surface-800 sticky left-0 z-10 min-w-40">
+            <th className="px-3 py-2 text-start text-slate-400 font-medium border-b border-surface-700 bg-surface-800 sticky start-0 z-10 min-w-40">
               הרשאה
             </th>
             {roles.map((r) => (
@@ -224,9 +226,9 @@ function PermissionMatrix({
         <tbody className="divide-y divide-surface-700/50">
           {allPermissions.map((p) => (
             <tr key={p} className="hover:bg-surface-700/30">
-              <td className="px-3 py-2 text-slate-300 font-mono bg-surface-800 sticky left-0 border-r border-surface-700">
+              <td className="px-3 py-2 text-slate-300 font-mono bg-surface-800 sticky start-0 border-e border-surface-700">
                 {PERMISSION_LABELS[p] ?? p}
-                <span className="block text-slate-600 text-[10px]">{p}</span>
+                <span className="block text-slate-400 text-[10px]">{p}</span>
               </td>
               {roles.map((r) => (
                 <td key={r.name} className="px-3 py-2 text-center">
@@ -271,7 +273,7 @@ export function PermissionsPage() {
   });
 
   const handleDelete = (name: string) => {
-    if (window.confirm(`למחוק את התפקיד "${name}"?`)) {
+    if (window.confirm(t("permissions.deleteConfirm", { name }))) {
       deleteMutation.mutate(name);
     }
   };
@@ -283,22 +285,21 @@ export function PermissionsPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-brand-500" />
-            {t("permissions.title")}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">{t("permissions.subtitle")}</p>
-        </div>
+      <PageHeader
+        title={<>{t("permissions.title")}</>}
+        subtitle={<>{t("permissions.subtitle")}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("permissions.createRole")}
         </button>
-      </div>
+          </>
+        }
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 bg-surface-800 p-1 rounded-lg w-fit border border-surface-700">
@@ -309,7 +310,7 @@ export function PermissionsPage() {
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab
                 ? "bg-brand-600 text-white"
-                : "text-slate-400 hover:text-white"
+                : "text-slate-400 hover:text-ink"
             }`}
           >
             {tab === "cards" ? t("permissions.roleCards") : t("permissions.matrix")}
@@ -330,7 +331,7 @@ export function PermissionsPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+        <div className="card overflow-hidden">
           <PermissionMatrix roles={roles} allPermissions={allPermissions} />
         </div>
       )}

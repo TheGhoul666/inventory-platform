@@ -1,49 +1,21 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Plus, Warehouse, X, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Warehouse, ToggleLeft, ToggleRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Field } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
+import { useDialog } from "@/hooks/useDialog";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
 
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Create Warehouse Modal ───────────────────────────────────────────────────
 
@@ -86,7 +58,7 @@ function CreateWarehouseModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal title="Add Warehouse" onClose={onClose}>
-      <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[60vh] overflow-y-auto pe-1">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Name *">
             <input value={form.name} onChange={set("name")} placeholder="Main Depot" className={inputCls} />
@@ -137,7 +109,7 @@ function CreateWarehouseModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending || !valid}
-          className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           {mutation.isPending ? "Creating…" : "Create"}
         </button>
@@ -186,32 +158,34 @@ export function WarehousesPage() {
     <div className="space-y-4">
       {showCreate && <CreateWarehouseModal onClose={() => setShowCreate(false)} />}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t("warehouses.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{warehouses.length} {t("warehouses.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("warehouses.title")}</>}
+        subtitle={<>{warehouses.length} {t("warehouses.title").toLowerCase()}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("warehouses.addWarehouse")}
         </button>
-      </div>
+          </>
+        }
+      />
 
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("warehouses.code")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.name")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.city")}</th>
-                <th className="px-4 py-3 text-left">{t("warehouses.country")}</th>
-                <th className="px-4 py-3 text-right">{t("warehouses.capacity")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.code")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.name")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.city")}</th>
+                <th className="px-4 py-3 text-start">{t("warehouses.country")}</th>
+                <th className="px-4 py-3 text-end">{t("warehouses.capacity")}</th>
                 <th className="px-4 py-3 text-center">{t("warehouses.status")}</th>
-                <th className="px-4 py-3 text-right">{t("warehouses.actions")}</th>
+                <th className="px-4 py-3 text-end">{t("warehouses.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -228,8 +202,8 @@ export function WarehousesPage() {
               ) : warehouses.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center">
-                    <Warehouse className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">{t("warehouses.noWarehouses")}</p>
+                    <Warehouse className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">{t("warehouses.noWarehouses")}</p>
                   </td>
                 </tr>
               ) : (
@@ -239,11 +213,11 @@ export function WarehousesPage() {
                     onClick={(e) => { if ((e.target as HTMLElement).closest("button")) return; navigate(`/warehouses/${wh.id}`); }}
                   >
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs font-semibold">{wh.code}</td>
-                    <td className="px-4 py-3 text-white font-medium">{wh.name}</td>
+                    <td className="px-4 py-3 text-ink font-medium">{wh.name}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.city || "—"}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.country}</td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
-                      {wh.capacity_sqm != null ? wh.capacity_sqm.toLocaleString() : "—"}
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
+                      {wh.capacity_sqm != null ? fmtNumber(wh.capacity_sqm) : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span
@@ -256,7 +230,7 @@ export function WarehousesPage() {
                         {wh.is_active ? t("common.active") : t("common.inactive")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <button
                         onClick={() =>
                           toggleMutation.mutate({ id: wh.id, is_active: !wh.is_active })

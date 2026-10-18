@@ -2,7 +2,9 @@ import React, { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { LoginPage } from "@/pages/LoginPage";
+import { LegalPage } from "@/pages/legal/LegalPage";
 import { useAuthStore } from "@/store/authStore";
+import { useTranslation } from "react-i18next";
 
 // Lazy-load pages for code splitting
 const Dashboard = lazy(() => import("@/pages/Dashboard").then((m) => ({ default: m.Dashboard })));
@@ -19,9 +21,10 @@ const AuditLogsPage = lazy(() => import("@/pages/AuditLogsPage").then((m) => ({ 
 const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 
 function PageLoader() {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center h-64 text-slate-400 text-sm">
-      טוען…
+      {t("common.loading")}
     </div>
   );
 }
@@ -49,6 +52,10 @@ const router = createBrowserRouter([
     path: "/login",
     element: <LoginPage />,
   },
+  { path: "/privacy", element: <LegalPage kind="privacy" /> },
+  { path: "/terms", element: <LegalPage kind="terms" /> },
+  { path: "/cookies", element: <LegalPage kind="cookies" /> },
+  { path: "/accessibility", element: <LegalPage kind="accessibility" /> },
   {
     path: "/",
     element: <AppLayout />,

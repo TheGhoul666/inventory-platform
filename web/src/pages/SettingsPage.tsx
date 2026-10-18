@@ -6,6 +6,7 @@ import { usersService } from "@/services/inventoryService";
 import { extractError } from "@/services/api";
 import { Shield, User, Mail, Key, LogOut, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 const ROLE_COLORS: Record<string, string> = {
   SuperAdmin: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
@@ -31,13 +32,10 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <h1 className="text-2xl font-bold text-white">{t("settings.title")}</h1>
-        <p className="text-slate-400 text-sm mt-1">Your account and session information</p>
-      </div>
+      <PageHeader title={t("settings.title")} subtitle="Your account and session information" />
 
       {/* Profile card */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{t("settings.profile")}</h2>
         </div>
@@ -47,7 +45,7 @@ export function SettingsPage() {
               {fullName !== "—" ? fullName[0].toUpperCase() : email[0].toUpperCase()}
             </div>
             <div>
-              <p className="text-white font-semibold text-lg">{fullName}</p>
+              <p className="text-ink font-semibold text-lg">{fullName}</p>
               <p className="text-slate-400 text-sm">{email}</p>
             </div>
           </div>
@@ -61,7 +59,7 @@ export function SettingsPage() {
       </div>
 
       {/* Notification phone */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
             <Phone className="h-4 w-4" /> Alert Notifications
@@ -78,12 +76,13 @@ export function SettingsPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+972501234567"
-              className="flex-1 bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+              aria-label="Phone"
+              className="flex-1 bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
             />
             <button
               onClick={() => phoneMutation.mutate()}
               disabled={phoneMutation.isPending}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-2 btn-primary text-sm font-medium transition-colors"
             >
               {phoneMutation.isPending ? "Saving…" : "Save"}
             </button>
@@ -92,13 +91,13 @@ export function SettingsPage() {
       </div>
 
       {/* Roles & Permissions */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-surface-700">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Access</h2>
         </div>
         <div className="p-6 space-y-4">
           <div>
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Roles</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Roles</p>
             <div className="flex flex-wrap gap-2">
               {is_superadmin && (
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center gap-1">
@@ -111,14 +110,14 @@ export function SettingsPage() {
                 </span>
               ))}
               {!is_superadmin && roles.length === 0 && (
-                <span className="text-slate-500 text-sm">No roles assigned</span>
+                <span className="text-slate-400 text-sm">No roles assigned</span>
               )}
             </div>
           </div>
 
           {permissions.length > 0 && !permissions.includes("*") && (
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Permissions</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Permissions</p>
               <div className="flex flex-wrap gap-1.5">
                 {permissions.map((p) => (
                   <span key={p} className="px-2 py-0.5 rounded bg-surface-700 text-slate-400 text-xs font-mono">
@@ -131,7 +130,7 @@ export function SettingsPage() {
 
           {permissions.includes("*") && (
             <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Permissions</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Permissions</p>
               <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-xs font-mono">* (all)</span>
             </div>
           )}
@@ -139,7 +138,7 @@ export function SettingsPage() {
       </div>
 
       {/* Sign out */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="p-6">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Session</h2>
           <button
@@ -160,10 +159,10 @@ function InfoRow({ icon, label, value, mono = false }: {
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="text-slate-500 w-4 flex-shrink-0">{icon}</div>
+      <div className="text-slate-400 w-4 flex-shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-slate-500 mb-0.5">{label}</p>
-        <p className={`text-white text-sm truncate ${mono ? "font-mono text-xs" : ""}`}>{value}</p>
+        <p className="text-xs text-slate-400 mb-0.5">{label}</p>
+        <p className={`text-ink text-sm truncate ${mono ? "font-mono text-xs" : ""}`}>{value}</p>
       </div>
     </div>
   );

@@ -6,10 +6,15 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import json
+import os
+import sys
 import uuid
 
-SUPABASE_URL = "https://wrspszdkmjdrhupvjblu.supabase.co"
-SERVICE_KEY = "sb_secret_e2KaQgxwa7ODEN6ZUyNP-A_XF9C_Ejk"
+# Credentials come from the environment — never commit keys to the repository.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+if not SUPABASE_URL or not SERVICE_KEY:
+    sys.exit("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY before running this script.")
 
 HEADERS = {
     "apikey": SERVICE_KEY,

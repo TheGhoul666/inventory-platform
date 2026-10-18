@@ -64,8 +64,8 @@ def _dedup_seen(key: str, ttl: int) -> bool:
         for k, exp in list(_dedup.items()):
             if exp < now:
                 _dedup.pop(k, None)
-    exp = _dedup.get(key)
-    if exp and exp > now:
+    expires = _dedup.get(key)
+    if expires and expires > now:
         return True
     _dedup[key] = now + ttl
     return False
@@ -105,7 +105,7 @@ async def _get_superadmin_recipients() -> list[Recipient]:
                     recipients.append(
                         Recipient(
                             user_id=u.id,
-                            name=user_meta.get("full_name") or user_meta.get("username") or u.email,
+                            name=user_meta.get("full_name") or user_meta.get("username") or u.email or "",
                             email=u.email,
                             phone=user_meta.get("phone"),
                         )

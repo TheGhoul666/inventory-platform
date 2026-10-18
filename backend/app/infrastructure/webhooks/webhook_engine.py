@@ -12,7 +12,6 @@ import hashlib
 import hmac
 import json
 import logging
-import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
@@ -91,6 +90,8 @@ class WebhookEngine:
             created_at=datetime.now(timezone.utc),
         )
 
+        if self._client is None:
+            raise RuntimeError("WebhookEngine HTTP client is not started")
         try:
             response = await self._client.post(
                 str(endpoint.url),

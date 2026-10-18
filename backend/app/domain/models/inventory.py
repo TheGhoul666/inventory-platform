@@ -8,6 +8,7 @@ This is enforced at three levels:
   3. SELECT FOR UPDATE in the repository (concurrency safety)
 """
 import uuid
+from typing import TYPE_CHECKING
 from decimal import Decimal
 
 from sqlalchemy import (
@@ -23,6 +24,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base, AuditMixin, UUIDPKMixin
+
+if TYPE_CHECKING:
+    from app.domain.models.transaction import InventoryTransaction
+    from app.domain.models.warehouse import Warehouse, WarehouseLocation
 
 
 class InventoryCategory(UUIDPKMixin, AuditMixin, Base):

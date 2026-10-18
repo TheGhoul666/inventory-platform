@@ -15,11 +15,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-# Hard ceiling for any single startup dependency connect. Startup must never
-# block on an unreachable external service — degrade gracefully instead.
-STARTUP_CONNECT_TIMEOUT = 8.0
-
-logger = logging.getLogger(__name__)
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -32,6 +27,12 @@ from app.api.middleware.request_context import RequestContextMiddleware, Securit
 from app.api.routes import auth, inventory, analytics, alerts, health, warehouses, buses, audit
 
 settings = get_settings()
+
+# Hard ceiling for any single startup dependency connect. Startup must never
+# block on an unreachable external service — degrade gracefully instead.
+STARTUP_CONNECT_TIMEOUT = 8.0
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager

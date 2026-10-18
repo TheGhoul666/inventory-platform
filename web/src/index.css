@@ -2,21 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .data-table thead tr {
+    @apply bg-surface-700/60 text-xs uppercase tracking-wider text-slate-400;
+  }
+  .data-table tbody tr {
+    @apply border-t border-surface-700 transition-colors hover:bg-surface-700/40;
+  }
+
+  .card {
+    @apply rounded-2xl border border-surface-600 bg-surface-800 shadow-card;
+  }
+  .btn-primary {
+    @apply rounded-full bg-clay text-white font-semibold transition-colors hover:bg-[#9a3817] active:bg-[#862f13] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply rounded-full border border-surface-600 bg-surface-800 text-slate-300 transition-colors hover:bg-surface-700 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html {
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: "Inter", "Heebo", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
-    @apply bg-surface-900 text-white;
+    @apply bg-surface-900 text-ink;
+    
   }
 
-  /* Custom scrollbar for dark theme */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-surface-900;
+  }
+
+  h1, h2, h3 {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    @apply bg-brand-900;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

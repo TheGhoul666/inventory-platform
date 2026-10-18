@@ -4,45 +4,17 @@ import { Plus, Trash2, X, Users, KeyRound, Check, Phone } from "lucide-react";
 import toast from "react-hot-toast";
 import { usersService, rolesService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtDate } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Field } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
+import { useDialog } from "@/hooks/useDialog";
 
 // ── Modal shell ───────────────────────────────────────────────────────────────
 
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 const ROLES = ["Viewer", "Technician", "WarehouseManager", "SuperAdmin"] as const;
 
@@ -152,7 +124,7 @@ function InviteUserModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending || !valid}
-          className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           {mutation.isPending ? "Inviting…" : "Invite"}
         </button>
@@ -200,21 +172,22 @@ function EditPermissionsModal({
     onError: (err) => toast.error(getError(err)),
   });
 
+  const dialog = useDialog(onClose);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-md shadow-2xl">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+      <div className="card p-6 w-full max-w-md ">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-semibold text-white">הרשאות: {user.email}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">הרשאות: {user.email}</h3>
+          <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-xs text-slate-400 mb-4">
           הרשאות מתפקיד ({user.roles?.[0]}) מסומנות בכחול ואינן ניתנות לשינוי.
           ניתן להוסיף / להסיר הרשאות נוספות מעבר לתפקיד.
         </p>
 
-        <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto mb-5 pr-1">
+        <div className="grid grid-cols-2 gap-1.5 max-h-60 overflow-y-auto mb-5 pe-1">
           {allPermissions.map((p) => {
             const fromRole = rolePerms.includes(p);
             const checked = fromRole || extraSet.has(p);
@@ -223,12 +196,12 @@ function EditPermissionsModal({
                 key={p}
                 onClick={() => toggle(p)}
                 disabled={fromRole}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-left transition-colors ${
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-start transition-colors ${
                   fromRole
                     ? "bg-brand-900/40 text-brand-300 cursor-default"
                     : checked
                     ? "bg-green-600/20 text-green-300 hover:bg-green-600/30"
-                    : "bg-surface-700 text-slate-400 hover:text-white"
+                    : "bg-surface-700 text-slate-400 hover:text-ink"
                 }`}
               >
                 <div className={`h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 ${
@@ -249,7 +222,7 @@ function EditPermissionsModal({
           <button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending}
-            className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+            className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
           >
             {mutation.isPending ? "שומר…" : "שמור"}
           </button>
@@ -292,7 +265,7 @@ function EditPhoneModal({ user, onClose }: { user: any; onClose: () => void }) {
   return (
     <Modal title={`Phone — ${user.email}`} onClose={onClose}>
       <div className="space-y-3">
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           SuperAdmins receive SMS alerts at this number for stock shortages and
           significant inventory changes. Use international format (e.g. +972501234567).
         </p>
@@ -316,7 +289,7 @@ function EditPhoneModal({ user, onClose }: { user: any; onClose: () => void }) {
         <button
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending || !isValidPhone(phone)}
-          className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           {mutation.isPending ? "Saving…" : "Save"}
         </button>
@@ -387,32 +360,34 @@ export function UsersPage() {
         <EditPhoneModal user={editPhoneUser} onClose={() => setEditPhoneUser(null)} />
       )}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t("users.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{users.length} {t("users.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("users.title")}</>}
+        subtitle={<>{users.length} {t("users.title").toLowerCase()}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowInvite(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("users.inviteUser")}
         </button>
-      </div>
+          </>
+        }
+      />
 
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("users.email")}</th>
-                <th className="px-4 py-3 text-left">{t("users.fullName")}</th>
-                <th className="px-4 py-3 text-left">{t("users.username")}</th>
-                <th className="px-4 py-3 text-left">Phone</th>
-                <th className="px-4 py-3 text-left">{t("users.role")}</th>
-                <th className="px-4 py-3 text-left">{t("users.created")}</th>
-                <th className="px-4 py-3 text-right">{t("users.actions")}</th>
+                <th className="px-4 py-3 text-start">{t("users.email")}</th>
+                <th className="px-4 py-3 text-start">{t("users.fullName")}</th>
+                <th className="px-4 py-3 text-start">{t("users.username")}</th>
+                <th className="px-4 py-3 text-start">Phone</th>
+                <th className="px-4 py-3 text-start">{t("users.role")}</th>
+                <th className="px-4 py-3 text-start">{t("users.created")}</th>
+                <th className="px-4 py-3 text-end">{t("users.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -429,8 +404,8 @@ export function UsersPage() {
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center">
-                    <Users className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">{t("users.noUsers")}</p>
+                    <Users className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">{t("users.noUsers")}</p>
                   </td>
                 </tr>
               ) : (
@@ -438,14 +413,14 @@ export function UsersPage() {
                   const role = user.roles?.[0] ?? "Viewer";
                   return (
                     <tr key={user.id} className="hover:bg-surface-700/50 transition-colors">
-                      <td className="px-4 py-3 text-white">{user.email}</td>
+                      <td className="px-4 py-3 text-ink">{user.email}</td>
                       <td className="px-4 py-3 text-slate-300">{user.full_name || "—"}</td>
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">{user.username || "—"}</td>
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">
                         {user.phone ? (
                           <span className="text-slate-300">{user.phone}</span>
                         ) : (
-                          <span className="text-slate-600">—</span>
+                          <span className="text-slate-400">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -457,16 +432,16 @@ export function UsersPage() {
                           } bg-transparent`}
                         >
                           {ROLES.map((r) => (
-                            <option key={r} value={r} className="bg-surface-800 text-white">
+                            <option key={r} value={r} className="bg-surface-800 text-ink">
                               {r}
                             </option>
                           ))}
                         </select>
                       </td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">
-                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : "—"}
+                      <td className="px-4 py-3 text-slate-400 text-xs">
+                        {fmtDate(user.created_at)}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-end">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => setEditPhoneUser(user)}

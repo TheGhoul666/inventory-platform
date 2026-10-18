@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bell, CheckCircle, XCircle, Filter } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { alertService } from "@/services/inventoryService";
 import { AlertBadge } from "@/components/ui/AlertBadge";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { FilterChips } from "@/components/ui/FilterChips";
+import { fmtDateTime } from "@/utils/format";
 import type { Alert, AlertSeverity, AlertStatus } from "@/types";
 
 export function AlertsPage() {
@@ -45,48 +48,43 @@ export function AlertsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Bell className="h-6 w-6 text-amber-400" />
-            {t("alerts.title")}
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">{alerts.length} {t("alerts.title").toLowerCase()}</p>
-        </div>
-        <div className="flex gap-2">
-          {(["", "OPEN", "ACKNOWLEDGED", "RESOLVED"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                statusFilter === s
-                  ? "bg-brand-600 text-white"
-                  : "bg-surface-700 text-slate-400 hover:text-white"
-              }`}
-            >
-              {s || "All"}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        title={<>{t("alerts.title")}</>}
+        subtitle={t("alerts.alertCount", { count: alerts.length })}
+        actions={
+          <>
+        <FilterChips
+          label={t("common.status")}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          options={[
+            { value: "", label: t("common.all") },
+            { value: "OPEN", label: t("alerts.open") },
+            { value: "ACKNOWLEDGED", label: t("alerts.acknowledged") },
+            { value: "RESOLVED", label: t("alerts.resolved") },
+          ]}
+        />
+          </>
+        }
+      />
 
       <div className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-surface-800 rounded-xl border border-surface-700 p-4 animate-pulse h-24" />
+              <div key={i} className="card p-4 animate-pulse h-24" />
             ))
           : alerts.length === 0
           ? (
-            <div className="bg-surface-800 rounded-xl border border-surface-700 p-12 text-center">
+            <div className="card p-12 text-center">
               <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-3" />
               <p className="text-slate-300 font-medium">{t("alerts.noAlerts")}</p>
-              <p className="text-slate-500 text-sm mt-1">{t("alerts.allClear")}</p>
+              <p className="text-slate-400 text-sm mt-1">{t("alerts.allClear")}</p>
             </div>
           )
           : alerts.map((alert) => (
             <div
               key={alert.id}
-              className="bg-surface-800 rounded-xl border border-surface-700 p-4 hover:border-surface-600 transition-colors"
+              className="card p-4 hover:border-surface-600 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
@@ -95,15 +93,15 @@ export function AlertsPage() {
                     <span className={`text-xs font-medium ${statusColors[alert.status]}`}>
                       {alert.status}
                     </span>
-                    <span className="text-xs text-slate-600">{alert.type}</span>
+                    <span className="text-xs text-slate-400">{alert.type}</span>
                   </div>
-                  <h3 className="font-medium text-white">{alert.title}</h3>
+                  <h3 className="font-medium text-ink">{alert.title}</h3>
                   <p className="text-slate-400 text-sm mt-0.5">{alert.message}</p>
-                  <p className="text-slate-600 text-xs mt-2">
-                    {new Date(alert.created_at).toLocaleString()}
+                  <p className="text-slate-400 text-xs mt-2">
+                    {fmtDateTime(alert.created_at)}
                     {alert.acknowledged_at && (
-                      <span className="ml-3">
-                        Acknowledged: {new Date(alert.acknowledged_at).toLocaleString()}
+                      <span className="ms-3">
+                        {t("alerts.acknowledgedAt")} {fmtDateTime(alert.acknowledged_at)}
                       </span>
                     )}
                   </p>

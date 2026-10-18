@@ -28,6 +28,7 @@ def configure_logging() -> None:
         structlog.processors.format_exc_info,
     ]
 
+    renderer: structlog.types.Processor
     if settings.is_production:
         renderer = structlog.processors.JSONRenderer()
     else:

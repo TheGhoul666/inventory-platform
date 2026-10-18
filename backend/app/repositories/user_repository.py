@@ -7,7 +7,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.models.user import User, Role, Permission, RefreshToken
+from app.domain.models.user import User, Role, RefreshToken
 
 
 class UserRepository:
@@ -17,7 +17,7 @@ class UserRepository:
     async def get_by_id(self, user_id: uuid.UUID) -> Optional[User]:
         result = await self._session.execute(
             select(User)
-            .where(User.id == user_id, User.is_deleted == False)
+            .where(User.id == user_id, User.is_deleted.is_(False))
             .options(
                 selectinload(User.roles).selectinload(Role.permissions)
             )
@@ -27,7 +27,7 @@ class UserRepository:
     async def get_by_email(self, email: str) -> Optional[User]:
         result = await self._session.execute(
             select(User)
-            .where(User.email == email, User.is_deleted == False)
+            .where(User.email == email, User.is_deleted.is_(False))
             .options(
                 selectinload(User.roles).selectinload(Role.permissions)
             )
@@ -37,7 +37,7 @@ class UserRepository:
     async def get_by_username(self, username: str) -> Optional[User]:
         result = await self._session.execute(
             select(User)
-            .where(User.username == username, User.is_deleted == False)
+            .where(User.username == username, User.is_deleted.is_(False))
             .options(
                 selectinload(User.roles).selectinload(Role.permissions)
             )
@@ -57,7 +57,6 @@ class UserRepository:
         )
 
     async def increment_failed_login(self, user_id: uuid.UUID) -> None:
-        from sqlalchemy import text
         await self._session.execute(
             update(User)
             .where(User.id == user_id)
@@ -97,7 +96,7 @@ class RefreshTokenRepository:
     async def get_by_hash(self, token_hash: str) -> Optional[RefreshToken]:
         result = await self._session.execute(
             select(RefreshToken)
-            .where(RefreshToken.token_hash == token_hash, RefreshToken.revoked == False)
+            .where(RefreshToken.token_hash == token_hash, RefreshToken.revoked.is_(False))
             .options(selectinload(RefreshToken.user).selectinload(User.roles).selectinload(Role.permissions))
         )
         return result.scalar_one_or_none()
@@ -112,6 +111,6 @@ class RefreshTokenRepository:
     async def revoke_all_for_user(self, user_id: uuid.UUID) -> None:
         await self._session.execute(
             update(RefreshToken)
-            .where(RefreshToken.user_id == user_id, RefreshToken.revoked == False)
+            .where(RefreshToken.user_id == user_id, RefreshToken.revoked.is_(False))
             .values(revoked=True)
         )

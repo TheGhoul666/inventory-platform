@@ -1,40 +1,20 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Bus, X } from "lucide-react";
+import { Plus, Bus } from "lucide-react";
 import toast from "react-hot-toast";
 import { busService, warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Field } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
+import { useDialog } from "@/hooks/useDialog";
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-emerald-500/15 text-emerald-400",
@@ -104,8 +84,8 @@ function CreateBusModal({ onClose }: { onClose: () => void }) {
     parseInt(form.year) > 1990;
 
   return (
-    <Modal title="Add Bus to Fleet" onClose={onClose}>
-      <div className="space-y-3 max-h-[65vh] overflow-y-auto pr-1">
+    <Modal size="lg" title="Add Bus to Fleet" onClose={onClose}>
+      <div className="space-y-3 max-h-[65vh] overflow-y-auto pe-1">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Fleet Number *">
             <input value={form.fleet_number} onChange={set("fleet_number")} placeholder="BUS-001" className={inputCls} />
@@ -155,7 +135,7 @@ function CreateBusModal({ onClose }: { onClose: () => void }) {
           Cancel
         </button>
         <button onClick={() => mutation.mutate()} disabled={mutation.isPending || !valid}
-          className="flex-1 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors">
+          className="flex-1 px-4 py-2 btn-primary text-sm font-medium transition-colors">
           {mutation.isPending ? "Adding…" : "Add Bus"}
         </button>
       </div>
@@ -195,32 +175,34 @@ export function BusesPage() {
     <div className="space-y-4">
       {showCreate && <CreateBusModal onClose={() => setShowCreate(false)} />}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t("buses.title")}</h1>
-          <p className="text-slate-400 text-sm mt-1">{buses.length} {t("buses.title").toLowerCase()}</p>
-        </div>
+      <PageHeader
+        title={<>{t("buses.title")}</>}
+        subtitle={<>{buses.length} {t("buses.title").toLowerCase()}</>}
+        actions={
+          <>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 btn-primary text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           {t("buses.addBus")}
         </button>
-      </div>
+          </>
+        }
+      />
 
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">{t("buses.fleetNumber")}</th>
-                <th className="px-4 py-3 text-left">{t("buses.model")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.fleetNumber")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.model")}</th>
                 <th className="px-4 py-3 text-center">{t("buses.year")}</th>
-                <th className="px-4 py-3 text-left">{t("buses.plateNumber")}</th>
-                <th className="px-4 py-3 text-right">{t("buses.mileage")}</th>
+                <th className="px-4 py-3 text-start">{t("buses.plateNumber")}</th>
+                <th className="px-4 py-3 text-end">{t("buses.mileage")}</th>
                 <th className="px-4 py-3 text-center">{t("buses.status")}</th>
-                <th className="px-4 py-3 text-right">{t("common.actions")}</th>
+                <th className="px-4 py-3 text-end">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -237,28 +219,28 @@ export function BusesPage() {
               ) : buses.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-16 text-center">
-                    <Bus className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">{t("buses.noBuses")}</p>
+                    <Bus className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">{t("buses.noBuses")}</p>
                   </td>
                 </tr>
               ) : (
                 buses.map((bus) => (
                   <tr key={bus.id} className="hover:bg-surface-700/50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-white font-semibold text-xs">{bus.fleet_number}</td>
+                    <td className="px-4 py-3 font-mono text-ink font-semibold text-xs">{bus.fleet_number}</td>
                     <td className="px-4 py-3">
-                      <p className="text-white font-medium">{bus.make} {bus.model}</p>
+                      <p className="text-ink font-medium">{bus.make} {bus.model}</p>
                     </td>
                     <td className="px-4 py-3 text-center text-slate-400">{bus.year}</td>
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{bus.license_plate}</td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
-                      {bus.mileage_km.toLocaleString()} km
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
+                      {fmtNumber(bus.mileage_km)} km
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[bus.status] ?? "bg-slate-500/15 text-slate-400"}`}>
                         {STATUS_LABELS[bus.status] ?? bus.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       {(bus.status === "ACTIVE" || bus.status === "MAINTENANCE") && (
                         <button
                           onClick={() => {

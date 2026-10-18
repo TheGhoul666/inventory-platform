@@ -19,7 +19,7 @@ async def readiness():
 
     try:
         sb = await get_async_admin()
-        result = await sb.table("warehouses").select("id").limit(1).execute()
+        await sb.table("warehouses").select("id").limit(1).execute()
         checks["database"] = "ok"
     except Exception as e:
         checks["database"] = f"error: {e}"

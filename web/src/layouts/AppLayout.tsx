@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { useAuthStore } from "@/store/authStore";
 import { useRealtimeInventory } from "@/hooks/useRealtimeInventory";
 import { useTranslation } from "react-i18next";
+import { LegalLinks } from "@/components/layout/LegalLinks";
 
 export function AppLayout() {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -26,13 +27,17 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-surface-900 text-white overflow-hidden">
+    <div className="flex h-screen gap-5 overflow-hidden bg-surface-900 p-4 text-ink md:p-5">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2">Skip to content</a>
       <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main id="main" className="flex-1 overflow-y-auto px-1 pb-4 pt-2">
           <Outlet />
         </main>
+        <footer className="pt-2">
+          <LegalLinks />
+        </footer>
       </div>
     </div>
   );

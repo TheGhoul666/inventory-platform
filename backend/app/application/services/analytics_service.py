@@ -9,7 +9,6 @@ Implements:
 """
 import uuid
 from datetime import datetime, timezone, timedelta
-from decimal import Decimal
 from typing import Optional
 
 from app.repositories.inventory_repository import InventoryRepository
@@ -72,8 +71,6 @@ class AnalyticsService:
         Compute Exponential Moving Average of daily consumption.
         EMA_t = α * actual_t + (1 - α) * EMA_(t-1)
         """
-        from app.domain.models.transaction import InventoryTransaction, TransactionType, TransactionStatus
-        from sqlalchemy import select, func, text
 
         # Get daily consumption for the past window
         # This is a simplified version — production would use a proper time-series query

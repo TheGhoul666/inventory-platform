@@ -21,7 +21,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import smtplib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from email.mime.text import MIMEText
 from functools import lru_cache
 from typing import Optional

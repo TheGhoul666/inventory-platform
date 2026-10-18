@@ -5,12 +5,16 @@ A Warehouse is a physical building. It has one or more Locations
 (aisle/shelf/bin coordinates). Items are placed at locations.
 """
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base, AuditMixin, UUIDPKMixin
+
+if TYPE_CHECKING:
+    from app.domain.models.inventory import InventoryItem
 
 
 class Warehouse(UUIDPKMixin, AuditMixin, Base):

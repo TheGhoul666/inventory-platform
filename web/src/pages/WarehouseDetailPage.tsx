@@ -9,64 +9,15 @@ import { inventoryService, warehouseService, busService } from "@/services/inven
 import { extractError as getError } from "@/services/api";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { useTranslation } from "react-i18next";
+import { Field } from "@/components/ui/Field";
+import { Modal, ModalActions } from "@/components/ui/Modal";
+import { useDialog } from "@/hooks/useDialog";
 import type { InventoryItem } from "@/types";
 
 // ── Shared primitives ─────────────────────────────────────────────────────────
 
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: React.ReactNode;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-6 w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-400 block mb-1">{label}</label>
-      {children}
-    </div>
-  );
-}
-
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm";
-
-function ModalActions({
-  onClose, onConfirm, pending, label, confirmClass = "bg-brand-600 hover:bg-brand-700 text-white",
-}: {
-  onClose: () => void; onConfirm: () => void; pending: boolean;
-  label: string; confirmClass?: string;
-}) {
-  return (
-    <div className="flex gap-3 mt-6">
-      <button onClick={onClose} className="flex-1 px-4 py-2 bg-surface-700 hover:bg-surface-600 text-slate-300 rounded-lg text-sm transition-colors">
-        Cancel
-      </button>
-      <button onClick={onConfirm} disabled={pending}
-        className={`flex-1 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors ${confirmClass}`}>
-        {pending ? "Processing…" : label}
-      </button>
-    </div>
-  );
-}
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Transfer Modal ────────────────────────────────────────────────────────────
 
@@ -115,8 +66,8 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
       <div className="space-y-4">
         <div className="bg-surface-700 rounded-lg p-3 text-sm">
           <p className="text-slate-400 text-xs mb-0.5">Source item</p>
-          <p className="text-white font-medium">{item.name}</p>
-          <p className="text-slate-500 text-xs font-mono">Available: {item.available_quantity} {item.unit}</p>
+          <p className="text-ink font-medium">{item.name}</p>
+          <p className="text-slate-400 text-xs font-mono">Available: {item.available_quantity} {item.unit}</p>
         </div>
 
         <Field label="Destination Warehouse">
@@ -135,10 +86,10 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
             {destItem ? (
               <div className="flex items-center justify-between bg-surface-700 rounded-lg p-2.5">
                 <div>
-                  <p className="text-white text-sm font-medium">{destItem.name}</p>
+                  <p className="text-ink text-sm font-medium">{destItem.name}</p>
                   <p className="text-slate-400 text-xs">{destItem.available_quantity} {destItem.unit} available</p>
                 </div>
-                <button onClick={() => setDestItem(null)} className="text-slate-500 hover:text-slate-300 transition-colors">
+                <button onClick={() => setDestItem(null)} className="text-slate-400 hover:text-slate-300 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -147,11 +98,11 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
                 <input value={search} onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by name or SKU…" className={inputCls} />
                 {destItems.length > 0 && (
-                  <div className="mt-1 bg-surface-700 border border-surface-600 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
+                  <div className="mt-1 bg-white border border-surface-600 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
                     {destItems.map((di) => (
                       <button key={di.id} onClick={() => setDestItem(di)}
-                        className="w-full text-left px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors">
-                        <span className="text-white">{di.name}</span>
+                        className="w-full text-start px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors">
+                        <span className="text-ink">{di.name}</span>
                         <span className="text-slate-400 text-xs tabular-nums">{di.available_quantity} {di.unit}</span>
                       </button>
                     ))}
@@ -180,7 +131,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
         </Field>
       </div>
       <ModalActions onClose={onClose} onConfirm={() => mutation.mutate()} pending={mutation.isPending}
-        label="Transfer" confirmClass={`text-white ${valid ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600/50 cursor-not-allowed"}`} />
+        label="Transfer" confirmClass={`text-white ${valid ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 opacity-50 cursor-not-allowed"}`} />
     </Modal>
   );
 }
@@ -217,17 +168,17 @@ function BusAssignModal({ item, onClose }: { item: InventoryItem; onClose: () =>
   const valid = !!busId && parseFloat(qty) > 0 && parseFloat(qty) <= item.available_quantity;
 
   return (
-    <Modal title={<><Bus className="inline h-4 w-4 mr-1.5 text-amber-400" />Assign to Bus: <span className="text-amber-400">{item.name}</span></>} onClose={onClose}>
+    <Modal title={<><Bus className="inline h-4 w-4 me-1.5 text-amber-400" />Assign to Bus: <span className="text-amber-400">{item.name}</span></>} onClose={onClose}>
       <div className="space-y-4">
         <div className="bg-surface-700 rounded-lg p-3 text-sm">
           <p className="text-slate-400 text-xs mb-0.5">Part</p>
-          <p className="text-white font-medium">{item.name}</p>
-          <p className="text-slate-500 text-xs font-mono">{item.sku} · Available: {item.available_quantity} {item.unit}</p>
+          <p className="text-ink font-medium">{item.name}</p>
+          <p className="text-slate-400 text-xs font-mono">{item.sku} · Available: {item.available_quantity} {item.unit}</p>
         </div>
 
         <Field label="Select Bus *">
           {buses.length === 0 ? (
-            <p className="text-slate-500 text-sm py-2">No buses in the fleet yet. Add buses first.</p>
+            <p className="text-slate-400 text-sm py-2">No buses in the fleet yet. Add buses first.</p>
           ) : (
             <select value={busId} onChange={(e) => setBusId(e.target.value)}
               className={`${inputCls} text-amber-300`}>
@@ -254,7 +205,7 @@ function BusAssignModal({ item, onClose }: { item: InventoryItem; onClose: () =>
       </div>
       <ModalActions onClose={onClose} onConfirm={() => mutation.mutate()} pending={mutation.isPending}
         label="Assign to Bus"
-        confirmClass={`text-white ${valid ? "bg-amber-600 hover:bg-amber-700" : "bg-amber-600/50 cursor-not-allowed"}`} />
+        confirmClass={`text-white ${valid ? "bg-amber-600 hover:bg-amber-700" : "bg-amber-600 opacity-50 cursor-not-allowed"}`} />
     </Modal>
   );
 }
@@ -345,10 +296,10 @@ export function WarehouseDetailPage() {
       {writeOffTarget && (
         <Modal title="Write Off Stock" onClose={() => setWriteOffTarget(null)}>
           <p className="text-slate-300 text-sm mb-1">
-            Drop all <span className="text-white font-semibold">{writeOffTarget.available_quantity} {writeOffTarget.unit}</span> of{" "}
-            <span className="text-white font-semibold">{writeOffTarget.name}</span> from this warehouse?
+            Drop all <span className="text-ink font-semibold">{writeOffTarget.available_quantity} {writeOffTarget.unit}</span> of{" "}
+            <span className="text-ink font-semibold">{writeOffTarget.name}</span> from this warehouse?
           </p>
-          <p className="text-slate-500 text-xs mb-6">Stock will be zeroed out. Recorded in the audit log.</p>
+          <p className="text-slate-400 text-xs mb-6">Stock will be zeroed out. Recorded in the audit log.</p>
           <div className="flex gap-3 mt-2">
             <button onClick={() => setWriteOffTarget(null)} className="flex-1 px-4 py-2 bg-surface-700 hover:bg-surface-600 text-slate-300 rounded-lg text-sm transition-colors">Cancel</button>
             <button onClick={() => writeOffMutation.mutate(writeOffTarget)} disabled={writeOffMutation.isPending}
@@ -362,9 +313,9 @@ export function WarehouseDetailPage() {
       {deleteTarget && (
         <Modal title="Delete Item" onClose={() => setDeleteTarget(null)}>
           <p className="text-slate-300 text-sm mb-1">
-            Permanently delete <span className="text-white font-semibold">{deleteTarget.name}</span>?
+            Permanently delete <span className="text-ink font-semibold">{deleteTarget.name}</span>?
           </p>
-          <p className="text-slate-500 text-xs mb-6">Cannot be undone. Write off stock first if any remains.</p>
+          <p className="text-slate-400 text-xs mb-6">Cannot be undone. Write off stock first if any remains.</p>
           <div className="flex gap-3 mt-2">
             <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2 bg-surface-700 hover:bg-surface-600 text-slate-300 rounded-lg text-sm transition-colors">Cancel</button>
             <button onClick={() => deleteMutation.mutate(deleteTarget.id)} disabled={deleteMutation.isPending}
@@ -378,12 +329,12 @@ export function WarehouseDetailPage() {
       {/* Header */}
       <div className="flex items-start gap-4">
         <button onClick={() => navigate("/warehouses")}
-          className="mt-1 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-700 transition-colors">
+          className="mt-1 p-1.5 rounded-lg text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">{warehouse.name}</h1>
+            <h1 className="text-3xl text-ink">{warehouse.name}</h1>
             <span className="text-xs font-mono bg-surface-700 text-slate-300 px-2 py-0.5 rounded">
               {warehouse.code}
             </span>
@@ -398,35 +349,36 @@ export function WarehouseDetailPage() {
             {warehouse.address && ` · ${warehouse.address}`}
           </p>
         </div>
-        <div className="text-right text-sm text-slate-400">
-          <p className="text-2xl font-bold text-white">{total}</p>
+        <div className="text-end text-sm text-slate-400">
+          <p className="text-2xl font-bold text-ink">{total}</p>
           <p>parts tracked</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <input
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          aria-label={t("common.search")}
           placeholder="Search parts by name or SKU…"
-          className="w-full pl-9 pr-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm"
+          className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-full text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
         />
       </div>
 
       {/* Parts table */}
-      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="data-table w-full text-sm">
             <thead>
               <tr className="border-b border-surface-700 text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">SKU</th>
-                <th className="px-4 py-3 text-left">Part Name</th>
-                <th className="px-4 py-3 text-right">Stock</th>
-                <th className="px-4 py-3 text-right">Reserved</th>
-                <th className="px-4 py-3 text-right">Available</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-start">SKU</th>
+                <th className="px-4 py-3 text-start">Part Name</th>
+                <th className="px-4 py-3 text-end">Stock</th>
+                <th className="px-4 py-3 text-end">Reserved</th>
+                <th className="px-4 py-3 text-end">Available</th>
+                <th className="px-4 py-3 text-end">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-700">
@@ -443,8 +395,8 @@ export function WarehouseDetailPage() {
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-16 text-center">
-                    <Package className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-500">
+                    <Package className="h-10 w-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-slate-400">
                       {search ? "No parts match your search" : "No parts in this warehouse yet"}
                     </p>
                   </td>
@@ -454,12 +406,12 @@ export function WarehouseDetailPage() {
                   <tr key={item.id} className="hover:bg-surface-700/50 transition-colors">
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{item.sku}</td>
                     <td className="px-4 py-3">
-                      <p className="text-white font-medium">{item.name}</p>
+                      <p className="text-ink font-medium">{item.name}</p>
                       {item.supplier_name && (
-                        <p className="text-slate-500 text-xs">{item.supplier_name}</p>
+                        <p className="text-slate-400 text-xs">{item.supplier_name}</p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <StockBadge
                         quantity={item.quantity}
                         lowThreshold={item.low_stock_threshold}
@@ -467,13 +419,13 @@ export function WarehouseDetailPage() {
                         unit={item.unit}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
                       {item.reserved_quantity} {item.unit}
                     </td>
-                    <td className="px-4 py-3 text-right text-emerald-400 font-medium tabular-nums">
+                    <td className="px-4 py-3 text-end text-emerald-400 font-medium tabular-nums">
                       {item.available_quantity} {item.unit}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-end">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setBusTarget(item)}
@@ -502,7 +454,7 @@ export function WarehouseDetailPage() {
                         </button>
                         <button
                           onClick={() => setDeleteTarget(item)}
-                          className="p-1.5 rounded text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                           title="Delete item"
                         >
                           <Trash2 className="h-3.5 w-3.5" />

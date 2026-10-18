@@ -2,13 +2,22 @@
 Integration tests for inventory API endpoints.
 Tests the full HTTP → Service → Repository → DB pipeline.
 """
+import os
+
 import pytest
 import pytest_asyncio
 from decimal import Decimal
 from httpx import AsyncClient
 
 
+requires_supabase = pytest.mark.skipif(
+    not os.getenv("RUN_SUPABASE_INTEGRATION"),
+    reason="inventory routes read/write through live Supabase; set RUN_SUPABASE_INTEGRATION=1 with real credentials",
+)
+
+
 @pytest.mark.asyncio
+@requires_supabase
 class TestInventoryIssue:
     async def test_issue_reduces_quantity(self, client: AsyncClient, auth_headers, test_item):
         initial_qty = float(test_item.quantity)
@@ -53,7 +62,8 @@ class TestInventoryIssue:
             "/api/v1/inventory/transactions/issue",
             json={"item_id": str(test_item.id), "quantity": 1},
         )
-        assert resp.status_code == 403
+        # FastAPI <0.122 answers 403 for a missing bearer token, newer versions 401
+        assert resp.status_code in (401, 403)
 
     async def test_restock_increases_quantity(self, client, auth_headers, test_item):
         initial_qty = float(test_item.quantity)
@@ -127,42 +137,21 @@ class TestInventoryIssue:
 
 @pytest.mark.asyncio
 class TestAuth:
-    async def test_login_success(self, client, test_user):
-        resp = await client.post(
-            "/api/v1/auth/login",
-            json={"email": test_user.email, "password": "testpassword123"},
-        )
-        assert resp.status_code == 200
-        data = resp.json()
-        assert "access_token" in data
-        assert "refresh_token" in data
-        assert data["token_type"] == "bearer"
+    """Login/refresh moved to the Supabase JS client; the API only verifies tokens."""
 
-    async def test_login_wrong_password(self, client, test_user):
-        resp = await client.post(
-            "/api/v1/auth/login",
-            json={"email": test_user.email, "password": "wrongpassword"},
-        )
+    async def test_me_returns_principal(self, client, auth_headers, test_user):
+        resp = await client.get("/api/v1/auth/me", headers=auth_headers)
+        assert resp.status_code == 200
+        assert resp.json()["email"] == test_user.email
+
+    async def test_garbage_token_rejected(self, client):
+        resp = await client.get("/api/v1/auth/me", headers={"Authorization": "Bearer not-a-jwt"})
         assert resp.status_code == 401
+        assert "not-a-jwt" not in resp.text
 
-    async def test_refresh_token_rotation(self, client, test_user):
-        login = await client.post(
-            "/api/v1/auth/login",
-            json={"email": test_user.email, "password": "testpassword123"},
-        )
-        refresh_token = login.json()["refresh_token"]
+    async def test_token_signed_with_wrong_secret_rejected(self, client, test_user):
+        from jose import jwt
 
-        resp = await client.post(
-            "/api/v1/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
-        assert resp.status_code == 200
-        new_data = resp.json()
-        assert new_data["refresh_token"] != refresh_token  # token rotated
-
-        # Old refresh token must now be invalid
-        resp2 = await client.post(
-            "/api/v1/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
-        assert resp2.status_code == 401
+        bad = jwt.encode({"sub": str(test_user.id), "aud": "authenticated"}, "wrong", algorithm="HS256")
+        resp = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {bad}"})
+        assert resp.status_code == 401
