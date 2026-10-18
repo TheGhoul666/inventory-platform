@@ -4,6 +4,7 @@ import { Plus, Trash2, X, Users, KeyRound, Check, Phone } from "lucide-react";
 import toast from "react-hot-toast";
 import { usersService, rolesService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtDate } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
 // ── Modal shell ───────────────────────────────────────────────────────────────
@@ -464,7 +465,7 @@ export function UsersPage() {
                         </select>
                       </td>
                       <td className="px-4 py-3 text-slate-500 text-xs">
-                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : "—"}
+                        {fmtDate(user.created_at)}
                       </td>
                       <td className="px-4 py-3 text-end">
                         <div className="flex items-center justify-end gap-1">

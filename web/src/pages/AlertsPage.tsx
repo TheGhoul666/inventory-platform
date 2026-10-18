@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { alertService } from "@/services/inventoryService";
 import { AlertBadge } from "@/components/ui/AlertBadge";
 import { useTranslation } from "react-i18next";
+import { fmtDateTime } from "@/utils/format";
 import type { Alert, AlertSeverity, AlertStatus } from "@/types";
 
 export function AlertsPage() {
@@ -100,10 +101,10 @@ export function AlertsPage() {
                   <h3 className="font-medium text-white">{alert.title}</h3>
                   <p className="text-slate-400 text-sm mt-0.5">{alert.message}</p>
                   <p className="text-slate-600 text-xs mt-2">
-                    {new Date(alert.created_at).toLocaleString()}
+                    {fmtDateTime(alert.created_at)}
                     {alert.acknowledged_at && (
                       <span className="ms-3">
-                        Acknowledged: {new Date(alert.acknowledged_at).toLocaleString()}
+                        {t("alerts.acknowledgedAt")} {fmtDateTime(alert.acknowledged_at)}
                       </span>
                     )}
                   </p>

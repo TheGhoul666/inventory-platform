@@ -5,6 +5,7 @@ import { Plus, Warehouse, X, ToggleLeft, ToggleRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
 // ── Shared primitives ────────────────────────────────────────────────────────
@@ -243,7 +244,7 @@ export function WarehousesPage() {
                     <td className="px-4 py-3 text-slate-400">{wh.city || "—"}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.country}</td>
                     <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
-                      {wh.capacity_sqm != null ? wh.capacity_sqm.toLocaleString() : "—"}
+                      {wh.capacity_sqm != null ? fmtNumber(wh.capacity_sqm) : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span

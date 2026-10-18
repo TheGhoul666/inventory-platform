@@ -4,6 +4,7 @@ import { Plus, Bus, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { busService, warehouseService } from "@/services/inventoryService";
 import { extractError as getError } from "@/services/api";
+import { fmtNumber } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
 // ── Primitives ────────────────────────────────────────────────────────────────
@@ -251,7 +252,7 @@ export function BusesPage() {
                     <td className="px-4 py-3 text-center text-slate-400">{bus.year}</td>
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{bus.license_plate}</td>
                     <td className="px-4 py-3 text-end text-slate-400 tabular-nums">
-                      {bus.mileage_km.toLocaleString()} km
+                      {fmtNumber(bus.mileage_km)} km
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[bus.status] ?? "bg-slate-500/15 text-slate-400"}`}>

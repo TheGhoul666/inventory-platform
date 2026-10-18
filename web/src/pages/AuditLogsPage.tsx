@@ -2,15 +2,8 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
 import { auditService } from "@/services/inventoryService";
+import { fmtDateTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
-
-function fmt(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("en-GB", {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  });
-}
 
 export function AuditLogsPage() {
   const { t } = useTranslation();
@@ -90,7 +83,7 @@ export function AuditLogsPage() {
               ) : (
                 logs.map((log) => (
                   <tr key={log.id} className="hover:bg-surface-700/50 transition-colors">
-                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmt(log.created_at)}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDateTime(log.created_at)}</td>
                     <td className="px-4 py-3 text-slate-300 text-xs">{log.username ?? log.user_id?.slice(0, 8) ?? "system"}</td>
                     <td className="px-4 py-3">
                       <span className="inline-block px-2 py-0.5 bg-brand-500/10 text-brand-400 rounded text-xs font-mono">

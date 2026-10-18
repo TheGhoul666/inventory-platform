@@ -20,6 +20,7 @@ import { inventoryService, warehouseService, busService } from "@/services/inven
 import { extractError as getError } from "@/services/api";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { useTranslation } from "react-i18next";
+import { fmtDate } from "@/utils/format";
 import type { InventoryItem, Transaction } from "@/types";
 
 // ── Shared modal shell ──────────────────────────────────────────────────────
@@ -655,7 +656,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
                         {tx.quantity_delta > 0 ? "+" : ""}{tx.quantity_delta}
                       </span>
                       <p className="text-slate-600 text-xs">
-                        {new Date(tx.created_at).toLocaleDateString()}
+                        {fmtDate(tx.created_at)}
                       </p>
                     </div>
                   </div>

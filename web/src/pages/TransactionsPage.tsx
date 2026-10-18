@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, RotateCcw } from "lucide-react";
 import { inventoryService } from "@/services/inventoryService";
+import { fmtDateTime } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 
 const TYPE_CONFIG: Record<string, { label: string; cls: string; Icon: React.ElementType }> = {
@@ -37,14 +38,6 @@ export function TransactionsPage() {
   const allTxns = data?.transactions ?? [];
   const filtered = typeFilter ? allTxns.filter((t: any) => t.type === typeFilter) : allTxns;
   const paged = filtered;
-
-  function fmt(iso: string | null) {
-    if (!iso) return "—";
-    return new Date(iso).toLocaleString("en-GB", {
-      day: "2-digit", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    });
-  }
 
   return (
     <div className="space-y-4">
@@ -119,7 +112,7 @@ export function TransactionsPage() {
                     </td>
                     <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_before}</td>
                     <td className="px-4 py-3 text-end tabular-nums text-slate-400">{txn.quantity_after}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmt(txn.created_at)}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDateTime(txn.created_at)}</td>
                     <td className="px-4 py-3 text-slate-500 text-xs max-w-[200px] truncate">{txn.notes || "—"}</td>
                   </tr>
                   );

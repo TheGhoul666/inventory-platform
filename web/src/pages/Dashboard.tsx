@@ -25,6 +25,7 @@ import { analyticsService, alertService } from "@/services/inventoryService";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { AlertBadge } from "@/components/ui/AlertBadge";
 import { useTranslation } from "react-i18next";
+import { fmtDateTime, fmtTime } from "@/utils/format";
 import type { Alert } from "@/types";
 
 function StatCard({
@@ -91,7 +92,7 @@ export function Dashboard() {
           <p className="text-slate-400 text-sm mt-1">
             {t("dashboard.subtitle")} •{" "}
             {summary?.generated_at
-              ? new Date(summary.generated_at).toLocaleTimeString()
+              ? fmtTime(summary.generated_at)
               : "—"}
           </p>
         </div>
@@ -189,7 +190,7 @@ export function Dashboard() {
                     <AlertBadge severity={alert.severity} />
                   </div>
                   <p className="text-slate-600 text-xs mt-1.5">
-                    {new Date(alert.created_at).toLocaleString()}
+                    {fmtDateTime(alert.created_at)}
                   </p>
                 </div>
               ))
