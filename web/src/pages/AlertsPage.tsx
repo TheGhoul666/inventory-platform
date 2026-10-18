@@ -50,7 +50,7 @@ export function AlertsPage() {
     <div className="space-y-4">
       <PageHeader
         title={<>{t("alerts.title")}</>}
-        subtitle={<>{alerts.length} {t("alerts.title").toLowerCase()}</>}
+        subtitle={t("alerts.alertCount", { count: alerts.length })}
         actions={
           <>
         <FilterChips
