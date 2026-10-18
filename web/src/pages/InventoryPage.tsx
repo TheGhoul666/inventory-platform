@@ -38,10 +38,10 @@ function Modal({
 }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
@@ -75,7 +75,7 @@ function ModalActions({
       </button>
       <button
         onClick={onConfirm}
-        disabled={pending}
+        disabled={pending || confirmClass.includes("cursor-not-allowed")}
         className={`flex-1 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors ${confirmClass}`}
       >
         {pending ? "Processing..." : label}
@@ -87,7 +87,7 @@ function ModalActions({
 // ── Field helper ────────────────────────────────────────────────────────────
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Issue modal ─────────────────────────────────────────────────────────────
 
@@ -341,7 +341,7 @@ function AddItemModal({ onClose }: { onClose: () => void }) {
         onConfirm={() => mutation.mutate()}
         pending={mutation.isPending}
         label="Create Item"
-        confirmClass={`text-white ${valid ? "bg-brand-600 hover:bg-brand-700" : "bg-brand-600/50 cursor-not-allowed"}`}
+        confirmClass={`text-white ${valid ? "bg-brand-600 hover:bg-brand-700" : "bg-brand-600 opacity-50 cursor-not-allowed"}`}
       />
     </Modal>
   );
@@ -400,7 +400,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
       <div className="space-y-4">
         <div className="bg-surface-700 rounded-lg p-3 text-sm">
           <p className="text-slate-400 text-xs mb-0.5">Source</p>
-          <p className="text-white font-medium">{item.name}</p>
+          <p className="text-ink font-medium">{item.name}</p>
           <p className="text-slate-400 text-xs font-mono">
             Available: {item.available_quantity} {item.unit}
           </p>
@@ -432,7 +432,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
             {destItem ? (
               <div className="flex items-center justify-between bg-surface-700 rounded-lg p-2.5">
                 <div>
-                  <p className="text-white text-sm font-medium">{destItem.name}</p>
+                  <p className="text-ink text-sm font-medium">{destItem.name}</p>
                   <p className="text-slate-400 text-xs">
                     {destItem.available_quantity} {destItem.unit} available
                   </p>
@@ -453,14 +453,14 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
                   className={inputCls}
                 />
                 {destItems.length > 0 && (
-                  <div className="mt-1 bg-surface-700 border border-surface-600 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
+                  <div className="mt-1 bg-white border border-surface-600 rounded-lg overflow-hidden max-h-36 overflow-y-auto">
                     {destItems.map((di) => (
                       <button
                         key={di.id}
                         onClick={() => setDestItem(di)}
                         className="w-full text-start px-3 py-2 hover:bg-surface-600 text-sm flex items-center justify-between transition-colors"
                       >
-                        <span className="text-white">{di.name}</span>
+                        <span className="text-ink">{di.name}</span>
                         <span className="text-slate-400 text-xs tabular-nums">
                           {di.available_quantity} {di.unit}
                         </span>
@@ -506,7 +506,7 @@ function TransferModal({ item, onClose }: { item: InventoryItem; onClose: () => 
         onConfirm={() => mutation.mutate()}
         pending={mutation.isPending}
         label="Transfer"
-        confirmClass={`text-white ${valid ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600/50 cursor-not-allowed"}`}
+        confirmClass={`text-white ${valid ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 opacity-50 cursor-not-allowed"}`}
       />
     </Modal>
   );
@@ -534,7 +534,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
   return (
     <div {...dialog.dialogProps} className="fixed inset-0 z-40 flex justify-end">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/30" onClick={onClose} />
 
       {/* Drawer */}
       <div className="relative w-full max-w-md bg-surface-900 border-s border-surface-700 shadow-2xl flex flex-col h-full overflow-hidden">
@@ -543,7 +543,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
           <div>
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-brand-400" />
-              <h2 id={dialog.titleId} className="text-lg font-semibold text-white">{item.name}</h2>
+              <h2 id={dialog.titleId} className="text-lg font-semibold text-ink">{item.name}</h2>
             </div>
             <p className="text-slate-400 text-xs font-mono mt-0.5">{item.sku}</p>
           </div>
@@ -557,7 +557,7 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
           {/* Stock summary */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Total", value: item.quantity, cls: "text-white" },
+              { label: "Total", value: item.quantity, cls: "text-ink" },
               { label: "Reserved", value: item.reserved_quantity, cls: "text-amber-400" },
               { label: "Available", value: item.available_quantity, cls: "text-emerald-400" },
             ].map(({ label, value, cls }) => (
@@ -589,19 +589,19 @@ function ItemDetailDrawer({ item, onClose }: { item: InventoryItem; onClose: () 
               {item.supplier_name && (
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Supplier</span>
-                  <span className="text-white">{item.supplier_name}</span>
+                  <span className="text-ink">{item.supplier_name}</span>
                 </div>
               )}
               {item.unit_cost != null && (
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Unit cost</span>
-                  <span className="text-white">${item.unit_cost.toFixed(2)}</span>
+                  <span className="text-ink">${item.unit_cost.toFixed(2)}</span>
                 </div>
               )}
               {item.lead_time_days != null && (
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Lead time</span>
-                  <span className="text-white">{item.lead_time_days} days</span>
+                  <span className="text-ink">{item.lead_time_days} days</span>
                 </div>
               )}
             </div>
@@ -725,7 +725,7 @@ export function InventoryPage() {
       {deleteTarget && (
         <Modal title="Delete Item" onClose={() => setDeleteTarget(null)}>
           <p className="text-slate-300 text-sm mb-1">
-            Permanently delete <span className="text-white font-semibold">{deleteTarget.name}</span>?
+            Permanently delete <span className="text-ink font-semibold">{deleteTarget.name}</span>?
           </p>
           <p className="text-slate-400 text-xs mb-6">
             This cannot be undone. Items with existing transactions cannot be deleted — write off the stock first.
@@ -744,8 +744,8 @@ export function InventoryPage() {
       {writeOffTarget && (
         <Modal title="Write Off Stock" onClose={() => setWriteOffTarget(null)}>
           <p className="text-slate-300 text-sm mb-1">
-            Write off all <span className="text-white font-semibold">{writeOffTarget.available_quantity} {writeOffTarget.unit}</span> of{" "}
-            <span className="text-white font-semibold">{writeOffTarget.name}</span>?
+            Write off all <span className="text-ink font-semibold">{writeOffTarget.available_quantity} {writeOffTarget.unit}</span> of{" "}
+            <span className="text-ink font-semibold">{writeOffTarget.name}</span>?
           </p>
           <p className="text-slate-400 text-xs mb-6">
             Stock will be set to zero. The transaction is recorded in the audit log.
@@ -766,7 +766,7 @@ export function InventoryPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("inventory.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("inventory.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">{total} {t("inventory.title").toLowerCase()}</p>
         </div>
         <button
@@ -787,7 +787,7 @@ export function InventoryPage() {
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             aria-label={t("common.search")}
             placeholder="Search SKU or name..."
-            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-lg text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
         </div>
         <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -841,7 +841,7 @@ export function InventoryPage() {
                     onClick={() => setDetailItem(item)}
                   >
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{item.sku}</td>
-                    <td className="px-4 py-3 text-white font-medium">{item.name}</td>
+                    <td className="px-4 py-3 text-ink font-medium">{item.name}</td>
                     <td className="px-4 py-3 text-end">
                       <StockBadge
                         quantity={item.quantity}

@@ -29,7 +29,7 @@ const roleColors: Record<string, string> = {
 };
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Create Role Modal ─────────────────────────────────────────────────────────
 
@@ -67,10 +67,10 @@ function CreateRoleModal({
 
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">יצירת תפקיד מותאם</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">יצירת תפקיד מותאם</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="h-5 w-5" />
           </button>
@@ -105,13 +105,13 @@ function CreateRoleModal({
                 className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors text-start ${
                   selected.has(p)
                     ? "bg-brand-600 text-white"
-                    : "bg-surface-700 text-slate-400 hover:text-white"
+                    : "bg-surface-700 text-slate-400 hover:text-ink"
                 }`}
               >
                 <div className={`h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 ${
-                  selected.has(p) ? "bg-white border-white" : "border-slate-500"
+                  selected.has(p) ? "bg-brand-600 border-brand-600" : "border-slate-500"
                 }`}>
-                  {selected.has(p) && <Check className="h-2.5 w-2.5 text-brand-600" />}
+                  {selected.has(p) && <Check className="h-2.5 w-2.5 text-white" />}
                 </div>
                 {PERMISSION_LABELS[p] ?? p}
               </button>
@@ -153,7 +153,7 @@ function RoleCard({
       <div className="flex items-start justify-between mb-3">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-white">{role.name}</h3>
+            <h3 className="text-sm font-semibold text-ink">{role.name}</h3>
             {role.is_system && (
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Lock className="h-3 w-3" /> מערכת
@@ -286,7 +286,7 @@ export function PermissionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-brand-500" />
             {t("permissions.title")}
           </h1>
@@ -310,7 +310,7 @@ export function PermissionsPage() {
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab
                 ? "bg-brand-600 text-white"
-                : "text-slate-400 hover:text-white"
+                : "text-slate-400 hover:text-ink"
             }`}
           >
             {tab === "cards" ? t("permissions.roleCards") : t("permissions.matrix")}

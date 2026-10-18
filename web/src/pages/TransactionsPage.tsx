@@ -43,14 +43,14 @@ export function TransactionsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("transactions.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("transactions.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">{filtered.length} {t("transactions.title").toLowerCase()}</p>
         </div>
         <select
           aria-label={t("transactions.type")}
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
-          className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500"
+          className="bg-white border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500"
         >
           <option value="">{t("common.all")}</option>
           <option value="ISSUE">{t("transactions.issue")}</option>
@@ -101,7 +101,7 @@ export function TransactionsPage() {
                     <td className="px-4 py-3">
                       {txn.item_name ? (
                         <div>
-                          <p className="text-white text-sm">{txn.item_name}</p>
+                          <p className="text-ink text-sm">{txn.item_name}</p>
                           <p className="text-slate-400 text-xs font-mono">{txn.item_sku}</p>
                         </div>
                       ) : (

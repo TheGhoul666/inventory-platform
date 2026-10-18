@@ -48,7 +48,7 @@ export function AlertsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
             <Bell className="h-6 w-6 text-amber-400" />
             {t("alerts.title")}
           </h1>
@@ -62,7 +62,7 @@ export function AlertsPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 statusFilter === s
                   ? "bg-brand-600 text-white"
-                  : "bg-surface-700 text-slate-400 hover:text-white"
+                  : "bg-surface-700 text-slate-400 hover:text-ink"
               }`}
             >
               {s || "All"}
@@ -98,7 +98,7 @@ export function AlertsPage() {
                     </span>
                     <span className="text-xs text-slate-400">{alert.type}</span>
                   </div>
-                  <h3 className="font-medium text-white">{alert.title}</h3>
+                  <h3 className="font-medium text-ink">{alert.title}</h3>
                   <p className="text-slate-400 text-sm mt-0.5">{alert.message}</p>
                   <p className="text-slate-400 text-xs mt-2">
                     {fmtDateTime(alert.created_at)}

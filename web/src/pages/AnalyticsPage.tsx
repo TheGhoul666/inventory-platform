@@ -52,7 +52,7 @@ export function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
           <BarChart3 className="h-6 w-6 text-brand-400" />
           {t("analytics.title")}
         </h1>
@@ -73,10 +73,10 @@ export function AnalyticsPage() {
             onChange={(e) => { setSearch(e.target.value); setShowDropdown(true); setSelectedItem(null); }}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             placeholder={t("analytics.searchPlaceholder")}
-            className="w-full ps-9 pe-4 py-2 bg-surface-700 border border-surface-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
+            className="w-full ps-9 pe-4 py-2 bg-white border border-surface-600 rounded-lg text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm"
           />
           {showDropdown && items.length > 0 && (
-            <div className="absolute top-full start-0 end-0 mt-1 bg-surface-700 border border-surface-600 rounded-lg shadow-xl z-20 overflow-hidden">
+            <div className="absolute top-full start-0 end-0 mt-1 bg-white border border-surface-600 rounded-lg shadow-xl z-20 overflow-hidden">
               {items.map((item) => (
                 <button
                   key={item.id}
@@ -84,7 +84,7 @@ export function AnalyticsPage() {
                   className="w-full px-4 py-2.5 text-start hover:bg-surface-600 transition-colors flex items-center justify-between gap-4"
                 >
                   <div>
-                    <span className="text-white text-sm font-medium">{item.name}</span>
+                    <span className="text-ink text-sm font-medium">{item.name}</span>
                     <span className="text-slate-400 text-xs ms-2 font-mono">{item.sku}</span>
                   </div>
                   <span className="text-slate-400 text-xs shrink-0">
@@ -103,7 +103,7 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="card p-6">
               <p className="text-slate-400 text-sm">{t("analytics.dailyRate")}</p>
-              <p className="text-3xl font-bold text-white mt-1">
+              <p className="text-3xl font-bold text-ink mt-1">
                 {usage?.daily_consumption_rate?.toFixed(2) ?? "—"}
               </p>
               <p className="text-slate-400 text-xs mt-1">{t("analytics.perDayAvg", { unit: selectedItem.unit })}</p>
@@ -143,7 +143,7 @@ export function AnalyticsPage() {
           {/* EMA chart */}
           {emaData.length > 0 && (
             <div className="card p-6">
-              <h2 className="font-semibold text-white mb-4">
+              <h2 className="font-semibold text-ink mb-4">
                 {t("analytics.emaTitle")}
               </h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -154,17 +154,17 @@ export function AnalyticsPage() {
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dde3f0" />
+                  <XAxis dataKey="date" stroke="#475569" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#1e293b",
-                      border: "1px solid #334155",
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #c9d2e6",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "#e2e8f0" }}
-                    itemStyle={{ color: "#94a3b8" }}
+                    labelStyle={{ color: "#0f172a" }}
+                    itemStyle={{ color: "#475569" }}
                   />
                   <Area
                     type="monotone"

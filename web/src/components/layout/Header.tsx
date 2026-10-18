@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header className="h-16 bg-surface-800/95 backdrop-blur border-b border-surface-700 flex items-center justify-between px-6">
       <div className="flex items-center gap-2 text-slate-400 text-sm">
-        <span className="text-white font-medium">{t("auth.welcomeBack")}</span>
+        <span className="text-ink font-medium">{t("auth.welcomeBack")}</span>
         <span>/</span>
         <span>{t("auth.subtitle")}</span>
       </div>
@@ -44,7 +44,7 @@ export function Header() {
           onClick={() => navigate("/alerts")}
           title={t("alerts.title")}
           aria-label={t("alerts.title")}
-          className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-surface-700 transition-colors"
+          className="relative p-2 rounded-lg text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors"
         >
           <Bell className="h-5 w-5" />
           {openAlertCount > 0 && (
@@ -61,7 +61,7 @@ export function Header() {
           </div>
           {user && (
             <div className="text-sm">
-              <p className="text-white font-medium leading-none">
+              <p className="text-ink font-medium leading-none">
                 {user.user_metadata?.full_name ?? user.email}
               </p>
               <p className="text-slate-400 text-xs mt-0.5">{roles[0] ?? "Viewer"}</p>

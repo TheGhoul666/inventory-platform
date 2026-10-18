@@ -53,14 +53,14 @@ export function Sidebar() {
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 shadow-md shadow-brand-900/50"><Bus className="h-4 w-4 text-white" /></span>
-            <span className="font-semibold tracking-tight text-white text-sm">{t("nav.appName")}</span>
+            <span className="font-semibold tracking-tight text-ink text-sm">{t("nav.appName")}</span>
           </div>
         )}
         <button
           onClick={toggleSidebar}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!sidebarCollapsed}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-700 transition-colors ms-auto"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors ms-auto"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform rtl:rotate-180", sidebarCollapsed && "rotate-180")} />
         </button>
@@ -79,7 +79,7 @@ export function Sidebar() {
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors group",
                 isActive
                   ? "bg-brand-600 text-white shadow-md shadow-brand-900/40"
-                  : "text-slate-400 hover:text-white hover:bg-surface-700"
+                  : "text-slate-400 hover:text-ink hover:bg-surface-700"
               )
             }
           >
@@ -93,7 +93,7 @@ export function Sidebar() {
       <div className="p-2 border-t border-surface-700">
         <NavLink
           to="/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-surface-700 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-ink hover:bg-surface-700 transition-colors"
         >
           <Settings className="h-5 w-5 shrink-0" />
           {!sidebarCollapsed && <span>{t("nav.settings")}</span>}

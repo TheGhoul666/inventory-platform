@@ -36,13 +36,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         position="top-right"
         toastOptions={{
           style: {
-            background: "#1e293b",
-            color: "#e2e8f0",
-            border: "1px solid #334155",
+            background: "#ffffff",
+            color: "#0f172a",
+            border: "1px solid #c9d2e6",
             borderRadius: "8px",
           },
-          success: { iconTheme: { primary: "#22c55e", secondary: "#1e293b" } },
-          error: { iconTheme: { primary: "#ef4444", secondary: "#1e293b" } },
+          success: { iconTheme: { primary: "#15803d", secondary: "#ffffff" } },
+          error: { iconTheme: { primary: "#c81e1e", secondary: "#ffffff" } },
         }}
       />
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}

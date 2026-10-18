@@ -24,7 +24,7 @@ export function LegalPage({ kind }: { kind: LegalKind }) {
       </a>
       <header className="border-b border-surface-700 bg-surface-800">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-white">
+          <Link to="/" className="flex items-center gap-2 font-semibold text-ink">
             <Bus className="h-5 w-5 text-brand-400" aria-hidden="true" />
             {t("nav.appName")}
           </Link>
@@ -40,16 +40,16 @@ export function LegalPage({ kind }: { kind: LegalKind }) {
       </header>
 
       <main id="legal-main" className="mx-auto max-w-3xl px-4 py-10" key={pathname}>
-        <Link to="/login" className="mb-6 inline-flex items-center gap-1 text-sm text-brand-300 underline underline-offset-2 hover:text-white">
+        <Link to="/login" className="mb-6 inline-flex items-center gap-1 text-sm text-brand-300 underline underline-offset-2 hover:text-ink">
           <ArrowRight className="h-4 w-4 rtl:rotate-0 ltr:rotate-180" aria-hidden="true" />
           {t("legal.back")}
         </Link>
-        <h1 className="text-3xl font-bold text-white">{doc.title}</h1>
+        <h1 className="text-3xl font-bold text-ink">{doc.title}</h1>
         {doc.intro && <p className="mt-3 leading-relaxed text-slate-300">{doc.intro}</p>}
         <div className="mt-8 space-y-8">
           {doc.sections.map((s) => (
             <section key={s.h} aria-labelledby={`h-${s.h}`}>
-              <h2 id={`h-${s.h}`} className="mb-2 text-lg font-semibold text-white">{s.h}</h2>
+              <h2 id={`h-${s.h}`} className="mb-2 text-lg font-semibold text-ink">{s.h}</h2>
               {s.p.map((para, i) => (
                 <p key={i} className="mb-2 leading-relaxed text-slate-300">{para}</p>
               ))}

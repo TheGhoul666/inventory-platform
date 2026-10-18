@@ -22,10 +22,10 @@ function Modal({
 }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
@@ -37,7 +37,7 @@ function Modal({
 }
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 const ROLES = ["Viewer", "Technician", "WarehouseManager", "SuperAdmin"] as const;
 
@@ -197,10 +197,10 @@ function EditPermissionsModal({
 
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-1">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">הרשאות: {user.email}</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">הרשאות: {user.email}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="h-5 w-5" />
           </button>
@@ -224,7 +224,7 @@ function EditPermissionsModal({
                     ? "bg-brand-900/40 text-brand-300 cursor-default"
                     : checked
                     ? "bg-green-600/20 text-green-300 hover:bg-green-600/30"
-                    : "bg-surface-700 text-slate-400 hover:text-white"
+                    : "bg-surface-700 text-slate-400 hover:text-ink"
                 }`}
               >
                 <div className={`h-3.5 w-3.5 rounded border flex items-center justify-center shrink-0 ${
@@ -385,7 +385,7 @@ export function UsersPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("users.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("users.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">{users.length} {t("users.title").toLowerCase()}</p>
         </div>
         <button
@@ -434,7 +434,7 @@ export function UsersPage() {
                   const role = user.roles?.[0] ?? "Viewer";
                   return (
                     <tr key={user.id} className="hover:bg-surface-700/50 transition-colors">
-                      <td className="px-4 py-3 text-white">{user.email}</td>
+                      <td className="px-4 py-3 text-ink">{user.email}</td>
                       <td className="px-4 py-3 text-slate-300">{user.full_name || "—"}</td>
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">{user.username || "—"}</td>
                       <td className="px-4 py-3 text-slate-400 font-mono text-xs">
@@ -453,7 +453,7 @@ export function UsersPage() {
                           } bg-transparent`}
                         >
                           {ROLES.map((r) => (
-                            <option key={r} value={r} className="bg-surface-800 text-white">
+                            <option key={r} value={r} className="bg-surface-800 text-ink">
                               {r}
                             </option>
                           ))}

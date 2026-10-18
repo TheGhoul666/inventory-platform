@@ -88,7 +88,7 @@ export function Dashboard() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("dashboard.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("dashboard.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">
             {t("dashboard.subtitle")} •{" "}
             {summary?.generated_at
@@ -142,7 +142,7 @@ export function Dashboard() {
         {/* Critical stock table */}
         <div className="card">
           <div className="p-4 border-b border-surface-700">
-            <h2 className="font-semibold text-white flex items-center gap-2">
+            <h2 className="font-semibold text-ink flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-400" />
               {t("dashboard.criticalStockTitle")}
             </h2>
@@ -154,7 +154,7 @@ export function Dashboard() {
               criticalItems.map((item: any) => (
                 <div key={item.id} className="p-4 flex items-center justify-between hover:bg-surface-700/50 transition-colors">
                   <div>
-                    <p className="font-medium text-white text-sm">{item.name}</p>
+                    <p className="font-medium text-ink text-sm">{item.name}</p>
                     <p className="text-slate-400 text-xs font-mono">{item.sku}</p>
                   </div>
                   <StockBadge
@@ -171,7 +171,7 @@ export function Dashboard() {
         {/* Open alerts */}
         <div className="card">
           <div className="p-4 border-b border-surface-700">
-            <h2 className="font-semibold text-white flex items-center gap-2">
+            <h2 className="font-semibold text-ink flex items-center gap-2">
               <Activity className="h-4 w-4 text-amber-400" />
               {t("dashboard.openAlertsTitle")}
             </h2>
@@ -184,7 +184,7 @@ export function Dashboard() {
                 <div key={alert.id} className="p-4 hover:bg-surface-700/50 transition-colors">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white text-sm truncate">{alert.title}</p>
+                      <p className="font-medium text-ink text-sm truncate">{alert.title}</p>
                       <p className="text-slate-400 text-xs mt-0.5 truncate">{alert.message}</p>
                     </div>
                     <AlertBadge severity={alert.severity} />

@@ -92,7 +92,7 @@ export function LoginPage() {
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-brand-600 mb-4">
             <Bus className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t("auth.welcomeBack")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("auth.welcomeBack")}</h1>
           <p className="text-slate-400 text-sm mt-1">{t("auth.subtitle")}</p>
         </div>
 
@@ -109,7 +109,7 @@ export function LoginPage() {
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === "signin"
                   ? "bg-brand-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-400 hover:text-ink"
               }`}
             >
               {t("auth.signIn")}
@@ -124,7 +124,7 @@ export function LoginPage() {
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === "signup"
                   ? "bg-brand-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-400 hover:text-ink"
               }`}
             >
               {t("auth.signUp")}
@@ -143,7 +143,7 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-white border border-surface-600 rounded-lg px-3 py-2.5 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="operator@depot.com"
                 />
               </div>
@@ -157,7 +157,7 @@ export function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                    className="w-full bg-white border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                     placeholder="••••••••"
                   />
                   <button
@@ -165,7 +165,7 @@ export function LoginPage() {
                     onClick={() => setShowPw(!showPw)}
                     aria-label={showPw ? t("a11y.hidePassword") : t("a11y.showPassword")}
                     aria-pressed={showPw}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-ink"
                   >
                     {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -188,7 +188,7 @@ export function LoginPage() {
                     if (error) toast.error(error.message);
                     else toast.success(t("auth.passwordResetSent"));
                   }}
-                  className="w-full text-sm text-slate-300 underline underline-offset-2 hover:text-white transition-colors"
+                  className="w-full text-sm text-slate-300 underline underline-offset-2 hover:text-ink transition-colors"
                 >
                   {t("auth.forgotPassword")}
                 </button>
@@ -208,7 +208,7 @@ export function LoginPage() {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   autoComplete="name"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-white border border-surface-600 rounded-lg px-3 py-2.5 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="John Smith"
                 />
               </div>
@@ -221,7 +221,7 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-white border border-surface-600 rounded-lg px-3 py-2.5 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                   placeholder="operator@depot.com"
                 />
               </div>
@@ -236,7 +236,7 @@ export function LoginPage() {
                     required
                     minLength={8}
                     autoComplete="new-password"
-                    className="w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                    className="w-full bg-white border border-surface-600 rounded-lg px-3 py-2.5 pe-10 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
                     placeholder="Min 8 characters"
                   />
                   <button
@@ -244,7 +244,7 @@ export function LoginPage() {
                     onClick={() => setShowPw(!showPw)}
                     aria-label={showPw ? t("a11y.hidePassword") : t("a11y.showPassword")}
                     aria-pressed={showPw}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-ink"
                   >
                     {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -261,9 +261,9 @@ export function LoginPage() {
                 />
                 <label htmlFor="su-agree" className="text-sm leading-snug text-slate-300">
                   {t("legal.agreePrefix")}
-                  <Link to="/terms" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-white">{t("legal.terms")}</Link>
+                  <Link to="/terms" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-ink">{t("legal.terms")}</Link>
                   {t("legal.agreeAnd")}
-                  <Link to="/privacy" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-white">{t("legal.privacy")}</Link>
+                  <Link to="/privacy" target="_blank" className="text-brand-300 underline underline-offset-2 hover:text-ink">{t("legal.privacy")}</Link>
                 </label>
               </div>
               <button

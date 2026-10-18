@@ -23,10 +23,10 @@ function Modal({
 }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
@@ -38,7 +38,7 @@ function Modal({
 }
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 // ── Create Warehouse Modal ───────────────────────────────────────────────────
 
@@ -183,7 +183,7 @@ export function WarehousesPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("warehouses.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("warehouses.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">{warehouses.length} {t("warehouses.title").toLowerCase()}</p>
         </div>
         <button
@@ -234,7 +234,7 @@ export function WarehousesPage() {
                     onClick={(e) => { if ((e.target as HTMLElement).closest("button")) return; navigate(`/warehouses/${wh.id}`); }}
                   >
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs font-semibold">{wh.code}</td>
-                    <td className="px-4 py-3 text-white font-medium">{wh.name}</td>
+                    <td className="px-4 py-3 text-ink font-medium">{wh.name}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.city || "—"}</td>
                     <td className="px-4 py-3 text-slate-400">{wh.country}</td>
                     <td className="px-4 py-3 text-end text-slate-400 tabular-nums">

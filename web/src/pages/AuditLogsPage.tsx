@@ -30,7 +30,7 @@ export function AuditLogsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("audit.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("audit.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">Immutable record of all system actions</p>
         </div>
         <div className="flex gap-2">
@@ -39,14 +39,14 @@ export function AuditLogsPage() {
             onChange={(e) => { setResourceType(e.target.value); setPage(0); }}
             aria-label={t("audit.resource")}
             placeholder="Resource type…"
-            className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
+            className="bg-white border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
           />
           <input
             value={actionFilter}
             onChange={(e) => { setActionFilter(e.target.value); setPage(0); }}
             aria-label={t("audit.action")}
             placeholder="Action…"
-            className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
+            className="bg-white border border-surface-600 rounded-lg px-3 py-2 text-slate-300 text-sm focus:outline-none focus:border-brand-500 w-40"
           />
         </div>
       </div>

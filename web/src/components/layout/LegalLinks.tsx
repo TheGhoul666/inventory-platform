@@ -14,7 +14,7 @@ export function LegalLinks({ className }: { className?: string }) {
   return (
     <nav aria-label={t("legal.navLabel")} className={cn("flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs", className)}>
       {links.map((l) => (
-        <Link key={l.to} to={l.to} className="text-slate-300 underline underline-offset-2 hover:text-white">
+        <Link key={l.to} to={l.to} className="text-slate-300 underline underline-offset-2 hover:text-ink">
           {l.label}
         </Link>
       ))}

@@ -14,10 +14,10 @@ import { useDialog } from "@/hooks/useDialog";
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   const dialog = useDialog(onClose);
   return (
-    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div {...dialog.dialogProps} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
       <div className="card p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 id={dialog.titleId} className="text-lg font-semibold text-white">{title}</h3>
+          <h3 id={dialog.titleId} className="text-lg font-semibold text-ink">{title}</h3>
           <button type="button" aria-label={dialog.closeLabel} onClick={onClose} className="text-slate-400 hover:text-slate-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
@@ -29,7 +29,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 }
 
 const inputCls =
-  "w-full bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
+  "w-full bg-white border border-surface-600 rounded-lg px-3 py-2 text-ink placeholder-slate-400 focus:outline-none focus:border-brand-500 text-sm";
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-emerald-500/15 text-emerald-400",
@@ -192,7 +192,7 @@ export function BusesPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t("buses.title")}</h1>
+          <h1 className="text-2xl font-bold text-ink">{t("buses.title")}</h1>
           <p className="text-slate-400 text-sm mt-1">{buses.length} {t("buses.title").toLowerCase()}</p>
         </div>
         <button
@@ -239,9 +239,9 @@ export function BusesPage() {
               ) : (
                 buses.map((bus) => (
                   <tr key={bus.id} className="hover:bg-surface-700/50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-white font-semibold text-xs">{bus.fleet_number}</td>
+                    <td className="px-4 py-3 font-mono text-ink font-semibold text-xs">{bus.fleet_number}</td>
                     <td className="px-4 py-3">
-                      <p className="text-white font-medium">{bus.make} {bus.model}</p>
+                      <p className="text-ink font-medium">{bus.make} {bus.model}</p>
                     </td>
                     <td className="px-4 py-3 text-center text-slate-400">{bus.year}</td>
                     <td className="px-4 py-3 font-mono text-slate-300 text-xs">{bus.license_plate}</td>
